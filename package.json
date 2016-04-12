@@ -1,0 +1,18 @@
+{
+  "name": "soapAngularJS",
+  "version": "1.0.0",
+  "description": "SOAP WSDL Binding.",
+  "main": "server.js",
+  "author": "Pierre Weymeels",
+  "license": "ISC",
+  "repository" :
+  { "type" : "git"
+  , "url" : "https://github.com/PierreWeymeels/Project-AngularNodeJS-soapAngularJS.git"
+  }
+  "dependencies": {
+    "body-parser": "^1.14.1",
+    "express": "^4.13.3",
+    "morgan": "^1.6.1",
+    "path": "^0.12.7"
+  }
+}

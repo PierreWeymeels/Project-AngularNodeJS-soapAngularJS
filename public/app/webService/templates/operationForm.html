@@ -1,0 +1,29 @@
+<div class='fAccordion well well-sm'>
+	<a href ng-click='toggle()'><h5 class="bg-info text-danger bordered">{{formInfo.name}} form</h5></a>
+	<form ng-show='visible' role="form" class=" animate-if" name="myForm" ng-submit='formSubmit()' novalidate>
+		<div class="form-inline ">
+			<div class="form-group well-sm" ng-repeat="inputI in formInfo.imputsInfo">
+				<label class="control-label text-primary " for="input_{{inputI.name}}" >{{inputI.name}}:</label>
+
+				<div ng-class="{'has-error': myForm[inputI.name].$invalid, 'has-success': !myForm[inputI.name].$invalid}">
+					<input class="form-control" id="input_{{inputI.name}}"
+					aria-describedby="helpBlock_{{inputI.name}}" name="{{inputI.name}}" type="{{inputI.type}}"
+					ng-model='respForm[inputI.name]' ng-required="{{inputI.required}}" >
+					<!--ng-pattern="input.format"   -->
+					</input>
+
+					<div ng-if='myForm[inputI.name].$invalid' role="alert" ng-messages= 'myForm[inputI.name].$error'>
+						<div ng-messages-include="app/miriade/templates/erreurs.html"></div>
+					</div>
+				</div>
+
+				<!--<span class="help-block text-info" id="helpBlock_{{inputI.name}}" >{{inputI.description}}</span>-->
+			</div>
+		</div>
+		<!--<pre>respForm = {{respForm | json}}</pre>   btn btn-sm btn-primarycol-md-6  btn-group-->
+		<div class=" well-sm" role="group" >
+			<input class="bg-info bordered " ng-click="resetForm()" value="{{formInfo.name}} reset" />
+			<input class="bg-info bordered " type="submit" value="{{formInfo.name}} submit" ng-disabled="myForm.$invalid"/>
+		</div>
+	</form>
+</div>

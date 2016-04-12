@@ -1,0 +1,14 @@
+<div class= well>
+	<h4>{{requestInfo.operation}} operation :</h4><h5>{{requestInfo.documentation}}</h5>
+	<data-accordion >
+		<!--<div ng-repeat="form in requestInfo.forms"></div>-->
+			<data-operation-form ng-repeat="form in requestInfo.forms" data-info='form'></data-operation-form>	
+	</data-accordion>
+
+	<!--<pre>respForm = {{respForm | json}}</pre>-->
+	<div class="btn-group " role="group" >
+		<input class="btn btn-sm btn-primary bordered" ng-click='backToOperations()' value="Back to operations" />
+		<input class="btn btn-sm btn-primary bordered" ng-click="resetForm()" value="Reset form" ng-if="isForm()"/>
+		<input class="btn btn-sm btn-primary bordered" type="submit" value="Send {{formInfo.operation}} request" ng-disabled="myForm.$invalid"/>
+	</div>
+</div>

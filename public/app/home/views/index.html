@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<!-- Mobile first : ensure proper rendering and touch zooming -->
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>soap_angularNodeJS</title>
+		<!-- FOR ANGULAR ROUTING -->
+		<base href="/">
+		<!-- CSS  -->
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css">
+		<link rel="stylesheet" href="assets/css/style.css">
+		<!-- JS before googleapis angular script otherwise jqlite instead of jquery inside directive-->
+		<script
+			src="https://code.jquery.com/jquery-2.2.1.min.js"
+			integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
+			crossorigin="anonymous">
+		</script>
+		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+		<!-- load angular and angular-route via CDN -->
+		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.10/angular.min.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.10/angular-route.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.10/angular-animate.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.10/angular-messages.js"></script>
+		<!-- APP -->
+		<script src="app/angular_scripts"></script>
+	</head>
+	<!-- ng-strict-di <=> strict dependencies manage -->
+	<body ng-app="app" ng-strict-di ng-controller="homeC as homeC">
+		<div class="container-fluid">
+			<!-- NAVBAR -->
+			<header class="page-header">
+				<div class="navbar navbar-inverse">
+					<div class="navbar-header">
+						<a href="/" class="navbar-brand"><span class="glyphicon glyphicon-home"></span>WP</a>
+					</div>
+					<!--<ul class="nav navbar-nav">
+					<li ng-if="homeC.loggedIn"><a href="/projects"><span class="glyphicon glyphicon-user"></span> Projects</a></li>
+					</ul>
+
+					<ul class="nav navbar-nav navbar-right">
+					<li ng-if="!main.loggedIn"><a href="/login">Login</a></li>
+					<li ng-if="main.loggedIn" class="navbar-text"> Hello {{ main.user}}!</li>
+					<li ng-if="main.loggedIn"><a href="#" ng-click="main.doLogout()">Logout</a></li>
+					</ul>-->
+				</div>
+			</header>
+			<!-- ANGULAR VIEWS -->
+			<div ng-view>
+
+			</div>
+		</div>
+	</body>
+</html>
