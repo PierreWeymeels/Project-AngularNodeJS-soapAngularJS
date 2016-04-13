@@ -5,10 +5,10 @@
   "main": "server.js",
   "author": "Pierre Weymeels",
   "license": "ISC",
-  "repository" :
-  { "type" : "git"
-  , "url" : "https://github.com/PierreWeymeels/Project-AngularNodeJS-soapAngularJS.git"
-  }
+  "repository" : { 
+  	"type" : "git",
+    "url" : "https://github.com/PierreWeymeels/Project-AngularNodeJS-soapAngularJS.git"
+  },
   "dependencies": {
     "body-parser": "^1.14.1",
     "express": "^4.13.3",

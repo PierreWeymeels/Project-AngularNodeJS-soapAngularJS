@@ -1,3 +1,6 @@
 <h1>SOAP WSDL CORS PROJECT</h1>
 
-<p>This project use WSDL file to auto-generate web service operations table and for each operation,their request forms</p>
+<h2>in progress...</h2>
+
+<p>This project use WSDL file to auto-generate web service operations table and for each operation, their request forms</p>
+
