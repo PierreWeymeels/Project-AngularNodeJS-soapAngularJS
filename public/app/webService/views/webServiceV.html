@@ -13,7 +13,7 @@
 	</div>
 	
 	<div ng-if="!wsC.initialized" class="btn-group animate-if" >
-		<input type="file" value="" file-dialog />
+		<input type="file" value="" data-file-dialog />
 	</div>
 	
 	<div ng-if="wsC.errorMsg" class="alert alert-danger fade in">
@@ -23,23 +23,9 @@
 	
 	<h3 ng-if="wsC.initialized">Link to {{wsC.fileName}} WSDL</h3>
 	
-	<div ng-if="wsC.operationsTable" class="animate-if table-responsive">
-		<table class="table table-bordered bg-success">
-			<thead>
-				<tr>
-					<th>Operation</th>
-					<th>Documentation</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr ng-repeat="operation in wsC.operations">
-					<td class="text-danger btn btn-sm " ng-click="wsC.operationRequest(operation.name)"><strong>{{operation.name}}</strong> </td>
-					<td class="text-info" >{{operation.documentation}}</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
+	<data-operations-table ng-if= 'wsC.tableVisibility' data-info= " wsC.wsdlWsInfo | toOperationsTable " data-back='wsC.tableAction("back")'>
+	</data-operations-table>
 	
-	<data-operation-forms ng-if="wsC.form" data-info='wsC.requestInfo' data-submit='wsC.formAction("submit")' data-back='wsC.formAction("back")'>
+	<data-operation-forms ng-if="wsC.formsVisibility" data-info='wsC.requestInfo' data-submit='wsC.formAction("submit")' data-back='wsC.formAction("back")'>
 	</data-operation-forms>
 </div>

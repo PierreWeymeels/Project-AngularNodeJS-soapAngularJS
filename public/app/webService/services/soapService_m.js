@@ -14,13 +14,13 @@ function(MODULE_TAG, $log, appMessage, soapRequest, soapWsdl, soapForm) {
 	//PRIVATE METHODS------------------------------------------------------------------
 	function allocateError(e, MODULE_TAG, method) {
 		if ( e instanceof appMessage.UserMsg)
-			return e.toString();
+			return e._toString();
 		else {
 			if (!( e instanceof appMessage.ExceptionMsg))
 				e = new appMessage.ExceptionMsg(MODULE_TAG, method, e.message);
-			$log.error(e.toString());
+			$log.error(e._toString());
 			var userMsg = new appMessage.UserMsg('fatal error', 'from soap service');
-			return userMsg.toString();
+			return userMsg._toString();
 		}
 	}
 
@@ -30,7 +30,7 @@ function(MODULE_TAG, $log, appMessage, soapRequest, soapWsdl, soapForm) {
 			if (soapWsdl.initializeWsdl(wsdl)) {
 				return {
 					'error' : false,
-					'data' : soapWsdl.getOperationsInfo()
+					'data' : soapWsdl.getPortTypeTreeInfo()
 				};
 			}
 		} catch(e) {
@@ -45,7 +45,7 @@ function(MODULE_TAG, $log, appMessage, soapRequest, soapWsdl, soapForm) {
 		try {
 			var result = new RequestInfo();
 			result.operation = operationName;
-			var msgInfo = soapWsdl.getMessageNodeInfo(operationName, 'input');
+			var msgInfo = soapWsdl.getMessageTreeInfo(operationName, 'input');
 			result.name = msgInfo.name;
 			result.documentation = msgInfo.documentation;
 			var partsInfo = msgInfo.parts;

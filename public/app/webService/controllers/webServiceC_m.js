@@ -5,14 +5,16 @@ function(soapService, $log, $scope) {
 	var vm = this;
 	//VIEW-MODEL VARIABLES:-------------------------------------------------
 	vm.errorMsg = false;
+	
 	vm.initialized = false;
+	vm.tableVisibility = false;
+	vm.formsVisibility = false;
+	
 	vm.fileName = null;
 
-	vm.operationsTable = false;
-	vm.operations = null;
-
-	vm.form = false;
+	vm.wsdlWsInfo = null;
 	vm.requestInfo = null;
+	
 	vm.respForm = null;
 	//END OF VIEW-MODEL VARIABLES:------------------------------------------
 	
@@ -28,8 +30,14 @@ function(soapService, $log, $scope) {
 		vm.fileName = fName;
 		var parser = new DOMParser();
 		var xmlDom = parser.parseFromString(file, "text/xml");
-		$log.debug('file:   ', xmlDom);
+		//$log.debug('file:   ', xmlDom);
 		initializeOpeTable(xmlDom,true); 
+	});
+	
+	$scope.$on('operationRequest', function(evt,operationName) {
+		evt.stopPropagation();
+		//TODO somethink
+		operationRequest(operationName,true);
 	});
 	
 	$scope.$watch(function() {
@@ -42,14 +50,13 @@ function(soapService, $log, $scope) {
 		vm.errorMsg = false;
 	}
 	
-	vm.operationRequest = function(operationName) {
-		var result = soapService.getRequestInfo(operationName);
-		if (!result.error) {
-			vm.requestInfo = result.data;
-			vm.operationsTable = false;
-			vm.form = true;
-		}else
-			vm.errorMsg = result.data;
+	vm.tableAction = function(action) {
+		switch(action) {
+		case 'back':
+			vm.tableVisibility = false;
+			vm.initialized = false;
+			
+		}
 	}
 	
 	vm.formAction = function(action) {
@@ -61,8 +68,8 @@ function(soapService, $log, $scope) {
 			//vm.respForm = miriadeFormMS.getFormDefaultResp();
 			break;
 		case 'back':
-			vm.form = false;
-			vm.operationsTable = true;
+			vm.formsVisibility = false;
+			vm.tableVisibility = true;
 		}
 	}
 	//END OF VIEW-MODEL METHODS:----------------------------------------------
@@ -71,13 +78,24 @@ function(soapService, $log, $scope) {
 	function initializeOpeTable(wsdl,outsideAng) {
 		var result = soapService.getWebService(wsdl);
 		if (!result.error) {
-			vm.operations = result.data;
+			vm.wsdlWsInfo = result.data;
 			vm.initialized = true;
-			vm.operationsTable = true;	
+			vm.tableVisibility = true;	
 		}else 
 			vm.errorMsg = result.data;
 		launchDigest(outsideAng);	
 	}
+	
+	function operationRequest(operationName,outsideAng) {
+		var result = soapService.getRequestInfo(operationName);
+		if (!result.error) {
+			vm.requestInfo = result.data;
+			vm.tableVisibility = false;
+			vm.formsVisibility = true;
+		}else
+			vm.errorMsg = result.data;
+		launchDigest(outsideAng);
+	}	
 	
 	function launchDigest(outsideAng){
 		if(outsideAng)

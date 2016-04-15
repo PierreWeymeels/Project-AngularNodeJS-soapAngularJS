@@ -1,30 +1,39 @@
 angular.module('appMessage_m', []).factory('appMessage', [
 function() {
-	
-return {
-	ExceptionMsg : function(module, method, message){
+
+	var ExceptionMsg = function(module, method, message) {
 		var that = this;
 		that.module = module;
 		that.method = method;
 		that.message = message;
-		
-		that.toString = function(){
-			return 'module: '+that.module
-				+' | method: '+that.method
-				+' | message: '+that.message;
+
+		if (!ExceptionMsg.prototype._toString) {
+			ExceptionMsg.prototype._toString = function() {
+				//this instead that because that will be the first instance of the class !
+				return 'module: ' + this.module 
+					+ ' | method: ' + this.method 
+					+ ' | message: ' + this.message;
+			};
 		};
+
 		return that;
-	},
-	UserMsg : function(type, message){
+	};
+
+	var UserMsg = function(type, message) {
 		var that = this;
 		that.type = type;
 		that.message = message;
-		
-		that.toString = function(){
-			return 'type: '+that.type
-				+' | message: '+that.message;
-		};
+
+		if (!UserMsg.prototype._toString) {
+			UserMsg.prototype._toString = function() {
+				return 'type: ' + this.type + ' | message: ' + this.message;
+			};
+		}
 		return that;
-	},
-};
+	};
+
+	return {
+		ExceptionMsg : ExceptionMsg,
+		UserMsg : UserMsg,
+	};
 }]);
