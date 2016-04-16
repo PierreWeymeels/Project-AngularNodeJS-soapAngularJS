@@ -1,10 +1,7 @@
-angular.module('soapWsdl_m', ['appMessage_m'])
-
-//CONSTANT///////////////////////////////////////////////////////////////////////
-//.constant('MODULE_TAG', 'soapWsdl_m')//TODO ISSUE => KEEP soapService MODULE_TAG value !!!
+angular.module('wsdlDataP_m', [])
 
 //CONFIG/////////////////////////////////////////////////////////////////////////
-.config(['soapWsdlProvider',
+.config(['wsdlDataPProvider',
 function(soapWsdlProvider) {
 	//TODO set this synchronous:
 	require(['../app/webService/services/libs/treeLib'], //['wslibs/treeLib'],
@@ -21,7 +18,7 @@ function(soapWsdlProvider) {
 })
 
 //PROVIDER///////////////////////////////////////////////////////////////////////
-.provider('soapWsdl', function() {
+.provider('wsdlDataP', function() {
 
 	//soapWsdlProvider data----------------------------------------------------------
 	this.treeLib = null;
@@ -30,7 +27,7 @@ function(soapWsdlProvider) {
 	this.$get = ['$log', 'appMessage',
 	function($log, appMessage) {
 		//PRIVATE VARIABLES----------------------------------------------------------
-		var MODULE_TAG = 'soapWsdl_m';
+		var MODULE_TAG = 'wsdlDataP_m';
 		var wsdlDefNode = null;
 		var treeLib = this.treeLib;
 

@@ -1,7 +1,7 @@
 "use strict";
-angular.module('app', 
+angular.module('app_m', 
 	['ngAnimate', 'ngMessages', 'appRoutes_m', 
-	 'appMessage_m', 'fileDialog_m','operationsTable_m', 
+	 'appMessage_m','fileDialog_m','operationsTable_m', 
 	 'accordion_m', 'operationForms_m', 'operationForm_m', 
 	 'homeC_m', 'webServiceC_m'
 	])

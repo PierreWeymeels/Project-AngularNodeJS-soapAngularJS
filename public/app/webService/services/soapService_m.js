@@ -1,16 +1,7 @@
-angular.module('soapService_m', ['appMessage_m','treeFilters_m', 'soapRequest_m', 'soapWsdl_m', 'soapForm_m'])
-.constant('MODULE_TAG', 'soapService_m')
-.factory('soapService', ['MODULE_TAG', '$log', 'appMessage','treeFilters', 'soapRequest', 'soapWsdl', 'soapForm',
-function(MODULE_TAG, $log, appMessage, treeFilters, soapRequest, soapWsdl, soapForm) {
-	//CLASSES -------------------------------------------------------------
-	function RequestInfo() {
-		var that = this;
-		that.operation = null;
-		that.name = null;
-		that.documentation = null;
-		that.forms = null;
-	};
-
+angular.module('soapService_m',['directivesDataP_m', 'soapRequest_m', 'wsdlDataP_m', 'soapMessage_m'])
+.factory('soapService', ['$log','appMessage','directivesDataP', 'soapRequest', 'wsdlDataP', 'soapMessage',
+function($log, appMessage, directivesDataP, soapRequest, wsdlDataP, soapMessage) {
+	var MODULE_TAG = 'soapService_m';
 	//PRIVATE METHODS------------------------------------------------------------------
 	function allocateError(e, MODULE_TAG, method) {
 		if ( e instanceof appMessage.UserMsg)
@@ -27,11 +18,11 @@ function(MODULE_TAG, $log, appMessage, treeFilters, soapRequest, soapWsdl, soapF
 	//PUBLIC METHODS------------------------------------------------------------------
 	function getWebService(wsdl) {
 		try {
-			if (soapWsdl.initializeWsdl(wsdl)) {
-				var pttData	= soapWsdl.getPortTypeTreeInfo('operation','documentation');
+			if (wsdlDataP.initializeWsdl(wsdl)) {
+				var pttData	= wsdlDataP.getPortTypeTreeInfo('operation','documentation');
 				return {
 					'error' : false,
-					'data' : treeFilters.getTableData(pttData)
+					'data' : directivesDataP.getTableData(pttData)
 				};
 			}
 		} catch(e) {
@@ -44,9 +35,9 @@ function(MODULE_TAG, $log, appMessage, treeFilters, soapRequest, soapWsdl, soapF
 
 	function getRequestInfo(operationName) {
 		try {
-			var result = new RequestInfo();
+			//var result = new RequestInfo();
 			result.operation = operationName;
-			var msgInfo = soapWsdl.getMessageTreeInfo(operationName, 'input');
+			var msgInfo = wsdlDataP.getMessageTreeInfo(operationName, 'input');
 			result.name = msgInfo.name;
 			result.documentation = msgInfo.documentation;
 			var partsInfo = msgInfo.parts;
@@ -87,3 +78,4 @@ function(MODULE_TAG, $log, appMessage, treeFilters, soapRequest, soapWsdl, soapF
 	};
 
 }]);
+

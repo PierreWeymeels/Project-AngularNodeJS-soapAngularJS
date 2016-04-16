@@ -2,11 +2,11 @@
  * and NodeData class define in soapWsdl for node.data.  
  * Not about xml node !!!
  */
-angular.module('treeFilters_m', ['appMessage_m'])
+angular.module('directivesDataP_m', [])//'appMessage_m'
 
-.factory('treeFilters', ['appMessage','$log',
+.factory('directivesDataP', ['appMessage','$log',
 function(appMessage, $log) {
-	var MODULE_TAG = 'treeFilters_m';
+	var MODULE_TAG = 'directivesDataP_m';
 	//business classes and methods:------------------------------------------------------------------
 	function webServiceInfo(name){
 		var that = this;
@@ -52,6 +52,17 @@ function(appMessage, $log) {
 		}
 	}
 	//-------------------------------------------------------------------------------------------------
+	
+	
+	/*
+	 	function RequestInfo() {
+			var that = this;
+			that.operation = null;
+			that.name = null;
+			that.documentation = null;
+			that.forms = null;
+		}; 
+	 */
 	
 	return {
 		getTableData: function(wsdlWsInfo){

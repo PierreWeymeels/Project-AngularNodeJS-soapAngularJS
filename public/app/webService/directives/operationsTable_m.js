@@ -1,7 +1,7 @@
 angular.module('operationsTable_m', [])
-.constant('MODULE_TAG', 'operationsTable_m')
-.directive("operationsTable", ['MODULE_TAG', '$log','$compile',
-function(MODULE_TAG,$log,$compile) {
+.directive("operationsTable", ['$log','$compile',
+function($log,$compile) {
+	var MODULE_TAG = 'operationsTable_m';
 	return {
 		restrict : "E",
 		priority : 0,
