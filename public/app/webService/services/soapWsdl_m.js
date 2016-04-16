@@ -64,7 +64,7 @@ function(soapWsdlProvider) {
 			return null;
 		}
 		
-		function addChildTree(parentTreeNode,parentXmlNode,childrenName){
+		function addChildTree(parentTreeNode,parentXmlNode,childrenName,grandChildrenName){
 			var childrenXmlNode;
 			if(childrenName !== null)
 			  childrenXmlNode = parentXmlNode.getElementsByTagName(childrenName);
@@ -73,7 +73,7 @@ function(soapWsdlProvider) {
 			for (var i = 0; i < childrenXmlNode.length; ++i) {
 					parentTreeNode.addChild(getNodeData(childrenXmlNode[i]));
 					if (childrenXmlNode[i].children.length !==0){
-						addChildTree(parentTreeNode.children[i],childrenXmlNode[i],null)
+						addChildTree(parentTreeNode.children[i],childrenXmlNode[i],grandChildrenName,null)
 					}  
 			}
 		}
@@ -154,11 +154,11 @@ function(soapWsdlProvider) {
 		 * @return
 		 * portType nodes tree attributes info !
 		 */
-		function getPortTypeTreeInfo() { 
+		function getPortTypeTreeInfo(childrenName,grandChildrenName) { 
 			try {	
 				var portTypeNode = wsdlDefNode.getElementsByTagName("portType")[0];
 			    var result = new treeLib.Tree(getNodeData(portTypeNode));  
-			    addChildTree(result._root,portTypeNode,null);
+			    addChildTree(result._root,portTypeNode,childrenName,grandChildrenName);
 				return result._root;
 			} catch(e) {
 				if (!( e instanceof appMessage.ExceptionMsg) || !( e instanceof appMessage.UserMsg))
@@ -192,8 +192,8 @@ function(soapWsdlProvider) {
 			initializeWsdl : function(newWsdl) {
 				return initializeWsdl(newWsdl);
 			},
-			getPortTypeTreeInfo : function() {
-				return getPortTypeTreeInfo();
+			getPortTypeTreeInfo : function(childrenName,grandChildrenName) {
+				return getPortTypeTreeInfo(childrenName,grandChildrenName);
 			},
 			getMessageTreeInfo : function(operationName, childNodeTag) {
 				return getMessageTreeInfo(operationName, childNodeTag);

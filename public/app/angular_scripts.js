@@ -12,7 +12,7 @@ module.exports = function (app, express) {
 				'/webService/directives/fileDialog_m.js','/webService/directives/operationsTable_m.js',
 				'/webService/directives/operationForms_m.js','/webService/directives/operationForm_m.js', 
 				'/webService/directives/accordion_m.js',
-				'/webService/filters/wsdlFilters_m.js',
+				'/webService/services/treeFilters_m.js',
 				'/webService/services/soapService_m.js','/webService/services/soapWsdl_m.js', 
 				'/webService/services/soapForm_m.js','/webService/services/soapRequest_m.js',
 				'/main_scripts/appRoutes_m.js','/main_scripts/appMessage_m.js','/main_scripts/app.js' 

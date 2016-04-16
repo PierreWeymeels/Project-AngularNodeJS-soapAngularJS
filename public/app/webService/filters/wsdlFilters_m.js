@@ -4,9 +4,10 @@
  */
 angular.module('wsdlFilters_m', ['appMessage_m'])
 .constant('MODULE_TAG', 'wsdlFilters_m')
-.filter('toOperationsTable', ['MODULE_TAG','appMessage','$log',
-function(MODULE_TAG, appMessage, $log) {
+.filter('toOperationsTable', ['MODULE_TAG','appMessage','$log','$cacheFactory',
+function(MODULE_TAG, appMessage, $log, $cacheFactory) {
 	var MODULE_TAG = 'MODULE_TAG';
+	var result = null;
 	//business classes and methods:------------------------------------------------------------------
 	function webServiceInfo(name){
 		var that = this;
@@ -79,11 +80,26 @@ function(MODULE_TAG, appMessage, $log) {
 			return false;
 		}
 	}
+	
 	//-------------------------------------------------------------------------------------------------
-	
-	return function(wsdlWsInfo){
-		var result = filter(wsdlWsInfo);
+	/*
+	 * ISSUE: if the filter creating a new object every time it's run => endLess $digest call !!!
+	 * 		  when the application's model becomes unstable and each $digest cycle triggers a state 
+	 * 		  change and subsequent $digest cycle.
+	 * 
+	 * RESOLUTION: call $cacheFactory or return var instead of function !
+	 * 
+	 * WARNING: If the values change frequently though then you should check 
+	 * 			if $cacheFactory discards old results to avoid a memory leak over time.
+	 * 
+	 * RESOLUTION: To avoid memory leak, i clear the result cache a soon as $digest is done using
+	 *             $timeout(fn, delay, false) with function fn(){ $cacheFactory.cache = {} }
+	 * 			   Set 3rd parameter to false, otherwise it will trigger $digest again.
+	 * 			 
+	 */
+	return function(wsdlWsInfo){	
+		if(result === null)
+			result = filter(wsdlWsInfo);
 		return result;
-	};
-	
+	}
 }]);

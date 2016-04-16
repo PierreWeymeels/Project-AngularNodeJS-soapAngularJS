@@ -117,6 +117,7 @@ define(["./Queue.src"], function(Queue) {
 
 					return childToRemove;
 				}
+				//TODO HASHCODE
 				
 			}
 		}

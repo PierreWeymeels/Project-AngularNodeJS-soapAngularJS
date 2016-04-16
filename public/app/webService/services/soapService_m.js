@@ -1,7 +1,7 @@
-angular.module('soapService_m', ['appMessage_m', 'soapRequest_m', 'soapWsdl_m', 'soapForm_m'])
+angular.module('soapService_m', ['appMessage_m','treeFilters_m', 'soapRequest_m', 'soapWsdl_m', 'soapForm_m'])
 .constant('MODULE_TAG', 'soapService_m')
-.factory('soapService', ['MODULE_TAG', '$log', 'appMessage', 'soapRequest', 'soapWsdl', 'soapForm',
-function(MODULE_TAG, $log, appMessage, soapRequest, soapWsdl, soapForm) {
+.factory('soapService', ['MODULE_TAG', '$log', 'appMessage','treeFilters', 'soapRequest', 'soapWsdl', 'soapForm',
+function(MODULE_TAG, $log, appMessage, treeFilters, soapRequest, soapWsdl, soapForm) {
 	//CLASSES -------------------------------------------------------------
 	function RequestInfo() {
 		var that = this;
@@ -28,9 +28,10 @@ function(MODULE_TAG, $log, appMessage, soapRequest, soapWsdl, soapForm) {
 	function getWebService(wsdl) {
 		try {
 			if (soapWsdl.initializeWsdl(wsdl)) {
+				var pttData	= soapWsdl.getPortTypeTreeInfo('operation','documentation');
 				return {
 					'error' : false,
-					'data' : soapWsdl.getPortTypeTreeInfo()
+					'data' : treeFilters.getTableData(pttData)
 				};
 			}
 		} catch(e) {

@@ -12,7 +12,7 @@ function(soapService, $log, $scope) {
 	
 	vm.fileName = null;
 
-	vm.wsdlWsInfo = null;
+	vm.webServiceInfo = null;
 	vm.requestInfo = null;
 	
 	vm.respForm = null;
@@ -78,7 +78,7 @@ function(soapService, $log, $scope) {
 	function initializeOpeTable(wsdl,outsideAng) {
 		var result = soapService.getWebService(wsdl);
 		if (!result.error) {
-			vm.wsdlWsInfo = result.data;
+			vm.webServiceInfo = result.data;
 			vm.initialized = true;
 			vm.tableVisibility = true;	
 		}else 

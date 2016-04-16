@@ -23,7 +23,7 @@
 	
 	<h3 ng-if="wsC.initialized">Link to {{wsC.fileName}} WSDL</h3>
 	
-	<data-operations-table ng-if= 'wsC.tableVisibility' data-info= " wsC.wsdlWsInfo | toOperationsTable " data-back='wsC.tableAction("back")'>
+	<data-operations-table ng-if= 'wsC.tableVisibility' data-info= 'wsC.webServiceInfo' data-back='wsC.tableAction("back")'>
 	</data-operations-table>
 	
 	<data-operation-forms ng-if="wsC.formsVisibility" data-info='wsC.requestInfo' data-submit='wsC.formAction("submit")' data-back='wsC.formAction("back")'>
