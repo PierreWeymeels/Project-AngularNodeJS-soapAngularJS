@@ -20,10 +20,10 @@ function(soapWsdlProvider) {
 //PROVIDER///////////////////////////////////////////////////////////////////////
 .provider('wsdlDataP', function() {
 
-	//soapWsdlProvider data----------------------------------------------------------
+	//wsdlDataPProvider data----------------------------------------------------------
 	this.treeLib = null;
 
-	//soapWsdl-----------------------------------------------------------------------
+	//wsdlDataP-----------------------------------------------------------------------
 	this.$get = ['$log', 'appMessage',
 	function($log, appMessage) {
 		//PRIVATE VARIABLES----------------------------------------------------------
@@ -142,9 +142,7 @@ function(soapWsdlProvider) {
 				}
 			} catch(e) {
 				wsdlDefNode = null;
-				if (!( e instanceof appMessage.ExceptionMsg) || !( e instanceof appMessage.UserMsg))
-					throw new appMessage.ExceptionMsg(MODULE_TAG, 'initializeWsdl', e.message);
-				throw e;
+				throw appMessage.allocateError(e, MODULE_TAG, 'initializeWsdl', false);
 			}
 		}
 
@@ -159,9 +157,7 @@ function(soapWsdlProvider) {
 			    addChildTree(result._root,portTypeNode,childrenName,grandChildrenName);
 				return result._root;
 			} catch(e) {
-				if (!( e instanceof appMessage.ExceptionMsg) || !( e instanceof appMessage.UserMsg))
-					throw new appMessage.ExceptionMsg(MODULE_TAG, 'getPortTypeTreeInfo', e.message);
-				throw e;
+				throw appMessage.allocateError(e, MODULE_TAG, 'getPortTypeTreeInfo', false);
 			}
 		}
 		
@@ -178,25 +174,27 @@ function(soapWsdlProvider) {
 				addChildTree(result._root,messageNode,null);		
 				return result._root;
 			} catch(e) {
-				if (!( e instanceof appMessage.ExceptionMsg) || !( e instanceof appMessage.UserMsg))
-					throw new appMessage.ExceptionMsg(MODULE_TAG, 'getMessageTreeInfo', e.message);
-				throw e;
+				throw appMessage.allocateError(e, MODULE_TAG, 'getMessageTreeInfo', false);
 			}
 		}
 		//END OF USED BY soapService---------------
 		
 		//USED BY directivesDataP:---------------
+		function isSimpleType(type){
+			try {
+				
+			} catch(e) {
+				throw appMessage.allocateError(e, MODULE_TAG, 'isSimpleType', false);
+			}
+		}
+		
 		function getComplexTypeTreeInfo(name){
 			try {
 				
 			} catch(e) {
-				if (!( e instanceof appMessage.ExceptionMsg) || !( e instanceof appMessage.UserMsg))
-					throw new appMessage.ExceptionMsg(MODULE_TAG, 'getComplexTypeTreeInfo', e.message);
-				throw e;
+				throw appMessage.allocateError(e, MODULE_TAG, 'getComplexTypeTreeInfo', false);
 			}
-		}
-		
-		
+		}	
 		//END OF USED BY directivesDataP---------------
 		//END OF PUBLIC METHODS------------------------------------------------------------------
 
@@ -214,6 +212,10 @@ function(soapWsdlProvider) {
 			}
 			
 			//USED BY directivesDataP:---------------
+			isSimpleType : function(type) {
+				return isSimpleType(type);
+			}
+			
 			getComplexTypeTreeInfo : function(name) {
 				return getComplexTypeTreeInfo(name);
 			}

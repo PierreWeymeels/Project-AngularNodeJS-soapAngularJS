@@ -13,7 +13,7 @@ function(soapService, $log, $scope) {
 	vm.fileName = null;
 
 	vm.webServiceInfo = null;
-	vm.requestInfo = null;
+	vm.msgRequestInfo = null;
 	
 	vm.respForm = null;
 	//END OF VIEW-MODEL VARIABLES:------------------------------------------
@@ -87,9 +87,9 @@ function(soapService, $log, $scope) {
 	}
 	
 	function operationRequest(operationName,outsideAng) {
-		var result = soapService.getRequestInfo(operationName);
+		var result = soapService.getMsgRequestInfo(operationName);
 		if (!result.error) {
-			vm.requestInfo = result.data;
+			vm.msgRequestInfo = result.data;
 			vm.tableVisibility = false;
 			vm.formsVisibility = true;
 		}else

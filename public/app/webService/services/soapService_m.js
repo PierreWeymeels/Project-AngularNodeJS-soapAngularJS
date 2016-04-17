@@ -6,17 +6,6 @@ function($log, appMessage, directivesDataP, soapRequest, wsdlDataP, soapMessage)
 	var MODULE_TAG = 'soapService_m';
 	
 	//PRIVATE METHODS------------------------------------------------------------
-	function allocateError(e, MODULE_TAG, method) {
-		if ( e instanceof appMessage.UserMsg)
-			return e._toString();
-		else {
-			if (!( e instanceof appMessage.ExceptionMsg))
-				e = new appMessage.ExceptionMsg(MODULE_TAG, method, e.message);
-			$log.error(e._toString());
-			var userMsg = new appMessage.UserMsg('fatal error', 'from soap service');
-			return userMsg._toString();
-		}
-	}
 
 	//PUBLIC METHODS---------------------------------------------------------------
 	function getWebService(wsdl) {
@@ -31,22 +20,22 @@ function($log, appMessage, directivesDataP, soapRequest, wsdlDataP, soapMessage)
 		} catch(e) {
 			return {
 				'error' : true,
-				'data' : allocateError(e, MODULE_TAG, 'getWebService')
+				'data' : appMessage.allocateError(e, MODULE_TAG, 'getWebService', true)
 			};
 		}
 	}
 
-	function getRequestInfo(operationName) {
+	function getMsgRequestInfo(operationName) {
 		try {
 			var wsdlMsgInfo = wsdlDataP.getMessageTreeInfo(operationName, 'input');
 			return {
 				'error' : false,
-				'data' : directivesDataP.getOperationFormsData(wsdlMsgInfo);
+				'data' : directivesDataP.getOperationFormsData(operationName, wsdlMsgInfo)
 			};
 		} catch(e) {
 			return {
 				'error' : true,
-				'data' : allocateError(e, MODULE_TAG, 'getRequestInfo')
+				'data' : appMessage.allocateError(e, MODULE_TAG, 'getMsgRequestInfo', true)
 			};
 		}
 	}
@@ -60,8 +49,8 @@ function($log, appMessage, directivesDataP, soapRequest, wsdlDataP, soapMessage)
 		getWebService : function(wsdl) {
 			return getWebService(wsdl);
 		},
-		getRequestInfo : function(operationName) {
-			return getRequestInfo(operationName);
+		getMsgRequestInfo : function(operationName) {
+			return getMsgRequestInfo(operationName);
 		}
 	};
 

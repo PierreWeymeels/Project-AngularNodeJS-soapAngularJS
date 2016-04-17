@@ -31,9 +31,41 @@ function() {
 		}
 		return that;
 	};
+	
+	function allocateError(e, MODULE_TAG, method,terminal) {
+		if ( e instanceof appMessage.UserMsg)
+			return (terminal) ? e._toString() : e;      
+		else {
+			if (!( e instanceof appMessage.ExceptionMsg))
+				e = new ExceptionMsg(MODULE_TAG, method, e.message);
+			$log.error(e._toString());
+			var userMsg = new UserMsg('fatal error', 'from soap service');
+			return (terminal) ? userMsg._toString() : userMsg;
+		}
+	}
+	
+	function allocateError(e, MODULE_TAG, method,terminal) {
+		if ( e instanceof appMessage.UserMsg)
+			return (terminal) ? e._toString() : e;      
+		else {
+			if (!( e instanceof appMessage.ExceptionMsg))
+				e = new appMessage.ExceptionMsg(MODULE_TAG, method, e.message);
+			if(terminal){
+				$log.error(e._toString());
+				var userMsg = new appMessage.UserMsg('fatal error', 'from soap service');
+				return userMsg._toString();
+			}else
+				return e;
+		}
+	}
 
 	return {
 		ExceptionMsg : ExceptionMsg,
+		
 		UserMsg : UserMsg,
+		
+		allocateError : function(e, MODULE_TAG, method, terminal){
+			return allocateError(e, MODULE_TAG, method, terminal);
+		}
 	};
 }]);
