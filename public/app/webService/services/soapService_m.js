@@ -1,8 +1,11 @@
 angular.module('soapService_m',['directivesDataP_m', 'soapRequest_m', 'wsdlDataP_m', 'soapMessage_m'])
 .factory('soapService', ['$log','appMessage','directivesDataP', 'soapRequest', 'wsdlDataP', 'soapMessage',
 function($log, appMessage, directivesDataP, soapRequest, wsdlDataP, soapMessage) {
+	
+	//PRIVATE VARIABLES----------------------------------------------------------
 	var MODULE_TAG = 'soapService_m';
-	//PRIVATE METHODS------------------------------------------------------------------
+	
+	//PRIVATE METHODS------------------------------------------------------------
 	function allocateError(e, MODULE_TAG, method) {
 		if ( e instanceof appMessage.UserMsg)
 			return e._toString();
@@ -15,7 +18,7 @@ function($log, appMessage, directivesDataP, soapRequest, wsdlDataP, soapMessage)
 		}
 	}
 
-	//PUBLIC METHODS------------------------------------------------------------------
+	//PUBLIC METHODS---------------------------------------------------------------
 	function getWebService(wsdl) {
 		try {
 			if (wsdlDataP.initializeWsdl(wsdl)) {
@@ -35,24 +38,10 @@ function($log, appMessage, directivesDataP, soapRequest, wsdlDataP, soapMessage)
 
 	function getRequestInfo(operationName) {
 		try {
-			//var result = new RequestInfo();
-			result.operation = operationName;
-			var msgInfo = wsdlDataP.getMessageTreeInfo(operationName, 'input');
-			result.name = msgInfo.name;
-			result.documentation = msgInfo.documentation;
-			var partsInfo = msgInfo.parts;
-			if(partsInfo.length === 0){
-				result.forms = [];
-				//TODO send soap request !
-			}else{
-				//TODO from parts to forms !
-			}
-			
-
-
+			var wsdlMsgInfo = wsdlDataP.getMessageTreeInfo(operationName, 'input');
 			return {
 				'error' : false,
-				'data' : result
+				'data' : directivesDataP.getOperationFormsData(wsdlMsgInfo);
 			};
 		} catch(e) {
 			return {
@@ -61,7 +50,6 @@ function($log, appMessage, directivesDataP, soapRequest, wsdlDataP, soapMessage)
 			};
 		}
 	}
-
 	//END OF PUBLIC METHODS-----------------------------------------------------------
 
 	//INTERFACE-----------------------------------------------------------------------

@@ -11,7 +11,7 @@
 		</thead>
 		<tbody>
 			<tr ng-repeat="operation in webServiceInfo.operations">
-				<td class="text-danger btn btn-sm " ng-click="operationRequest(operation.name)"><strong>{{operation.name}}</strong></td>
+				<td class="text-danger btn btn-sm " ng-click='operationRequest(operation.name)'><strong>{{operation.name}}</strong></td>
 				<td class="text-info" >{{operation.documentation}}</td>
 			</tr>
 		</tbody>

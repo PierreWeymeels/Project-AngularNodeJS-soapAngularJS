@@ -45,15 +45,15 @@ function($log,$compile) {
 					scope.formSubmit = function() {
 						scope.formInfo.defaultResp = scope.respForm;
 					}
+					
+					scope.respForm = angular.copy(scope.formInfo.defaultResp);
 				}
 			}
 		},
 		controller : ['$scope',
 		function(scope, $scope, $parent) {
-			var vm = this;
-			vm.respForm = angular.copy(scope.formInfo.defaultResp);
 			//$log.debug("operationForm controller",scope.formInfo);
-
+			var vm = this;
 		}],
 
 	}

@@ -127,6 +127,7 @@ function(soapWsdlProvider) {
 		//END CLASSES ------------------------------------------------------------------------
 
 		//PUBLIC METHODS------------------------------------------------------------------
+		//USED BY soapService:---------------
 		function initializeWsdl(newWsdl) {
 			try {
 				$log.debug('treeLib', treeLib);
@@ -167,11 +168,11 @@ function(soapWsdlProvider) {
 		/*
 		 * @return message nodes tree attributes info ! 
 		 * @param operationName 
-		 * @param childNodeTag : imput or output | Help to get de correct message
+		 * @param childOpeNodeTag : imput or output | Help to get de correct message
 		 */
-		function getMessageTreeInfo(operationName, childNodeTag){
+		function getMessageTreeInfo(operationName, childOpeNodeTag){
 			try {	
-				var messageName = getName(getOpeMsgAttribValue(operationName, childNodeTag), ':', null);
+				var messageName = getName(getOpeMsgAttribValue(operationName, childOpeNodeTag), ':', null);
 				var messageNode = getNodeByAttribute(wsdlDefNode, 'name', messageName);
 				var result = new treeLib.Tree(getNodeData(messageNode)); 
 				addChildTree(result._root,messageNode,null);		
@@ -182,10 +183,26 @@ function(soapWsdlProvider) {
 				throw e;
 			}
 		}
+		//END OF USED BY soapService---------------
+		
+		//USED BY directivesDataP:---------------
+		function getComplexTypeTreeInfo(name){
+			try {
+				
+			} catch(e) {
+				if (!( e instanceof appMessage.ExceptionMsg) || !( e instanceof appMessage.UserMsg))
+					throw new appMessage.ExceptionMsg(MODULE_TAG, 'getComplexTypeTreeInfo', e.message);
+				throw e;
+			}
+		}
+		
+		
+		//END OF USED BY directivesDataP---------------
 		//END OF PUBLIC METHODS------------------------------------------------------------------
 
 		//INTERFACE-----------------------------------------------------------------------
 		return {
+			//USED BY soapService:---------------
 			initializeWsdl : function(newWsdl) {
 				return initializeWsdl(newWsdl);
 			},
@@ -194,6 +211,11 @@ function(soapWsdlProvider) {
 			},
 			getMessageTreeInfo : function(operationName, childNodeTag) {
 				return getMessageTreeInfo(operationName, childNodeTag);
+			}
+			
+			//USED BY directivesDataP:---------------
+			getComplexTypeTreeInfo : function(name) {
+				return getComplexTypeTreeInfo(name);
 			}
 		};
 

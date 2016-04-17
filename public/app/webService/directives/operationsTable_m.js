@@ -21,6 +21,10 @@ function($log,$compile) {
 				},
 				post : function postLink(scope, element, attrs, accordionController) {
 					//$log.debug(MODULE_TAG+" postLink", scope.webServiceInfo);
+					//Catch scope event here:
+					scope.operationRequest = function(operationName){
+						scope.$emit('operationRequest', operationName);
+					}	
 				}
 			}
 		},
@@ -28,9 +32,7 @@ function($log,$compile) {
 		function(scope, $scope, $parent) {
 			//$log.debug(MODULE_TAG+" controller",scope.webServiceInfo);
 			var vm = this;
-			vm.operationRequest = function(operationName){
-				scope.$emit('operationRequest', operationName);
-			}			
+			//Init vm variables here:		
 		}],
 
 	}
