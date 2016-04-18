@@ -28,23 +28,23 @@ function(appMessage, $log, wsdlDataP) {
 	
 	function getPartInfo(partAttributes){
 		var result = new PartInfo(getAttributeValue('name', partAttributes));
-		var type = getAttributeValue('type', partAttributes);
-		if(wsdlDataP.isSimpleType(type))
-			result.element = getImputInfo(result.name,type);
+		var wsdlType = getAttributeValue('type', partAttributes);
+		if(wsdlDataP.isSimpleType(wsdlType))
+			result.element = getImputInfo(result.name, wsdlType);
 		else  
-			result.form = getFormInfo(wsdlDataP.getComplexTypeTreeInfo(type));
+			result.form = getFormInfo(wsdlDataP.getComplexTypeTreeInfo(wsdlType, null));
 		return result;
 	}
 	
-	function getImputInfo(name,type){
+	function getImputInfo(name,wsdlType){
 		var result = new ImputInfo();
 		result.name = name;
-		result.type = type;
+		setHtmlType(getXmlType(wsdlType),result);
 		return result;
 	}
 	
 	function getFormInfo(wsdlComplexTypeInfo){
-		var result = new FormInfo()
+		var result = new FormInfo();
 		
 		return result;
 	}
@@ -173,9 +173,9 @@ function(appMessage, $log, wsdlDataP) {
 		var that = this;
 		that.name = '';
 		that.type = '';
-		that.step = null;
+		that.step = '';
 		that.required = false;
-		that.value = null;
+		that.value = '';
 		that.format = '';
 		that.description = 'undocumented';
 		

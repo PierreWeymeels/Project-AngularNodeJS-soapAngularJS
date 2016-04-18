@@ -61,6 +61,12 @@ function(soapWsdlProvider) {
 			return null;
 		}
 		
+		function getTree(parentXmlNode,childrenName,grandChildrenName){
+			var result = new treeLib.Tree(getNodeData(parentXmlNode)); 
+			addChildTree(result._root,parentXmlNode,childrenName,grandChildrenName);
+			return result._root;
+		}
+		
 		function addChildTree(parentTreeNode,parentXmlNode,childrenName,grandChildrenName){
 			var childrenXmlNode;
 			if(childrenName !== null)
@@ -109,6 +115,27 @@ function(soapWsdlProvider) {
 			}
 			return null;
 		}
+		
+		//TODO consider case value= xsd... without :
+		function isType(typeValue, prefixe) {
+			return (typeValue.split(':')[0] == prefixe)
+		}
+		
+		function isWithoutPrefixe(typeValue) {
+			return (typeValue.split(':').length === 1);
+		}
+		
+		//TODO select by specific shema :
+		function getComplexTypeNode(nameValue) {
+			var result;
+			var schemaNodes = wsdlDefNode.getElementsByTagName("schema");
+			for (var i = 0; i < schemaNodes.length; ++i) {
+				result = getNodeByAttribute(schemaNodes[i], 'name', nameValue);
+				if (result !== null)
+					return result;
+			}
+			throw new appMessage.ExceptionMsg(MODULE_TAG, 'getComplexTypeNode', 'complexTypeNode: ' + nameValue + ' = null');
+		}
 		//END OF PRIVATE METHODS-------------------------------------------------------------
 
 		//CLASSES ---------------------------------------------------------------------------
@@ -127,7 +154,7 @@ function(soapWsdlProvider) {
 		//END CLASSES ------------------------------------------------------------------------
 
 		//PUBLIC METHODS------------------------------------------------------------------
-		//USED BY soapService:---------------
+		//USED BY soapService:-----------------
 		function initializeWsdl(newWsdl) {
 			try {
 				$log.debug('treeLib', treeLib);
@@ -153,9 +180,7 @@ function(soapWsdlProvider) {
 		function getPortTypeTreeInfo(childrenName,grandChildrenName) { 
 			try {	
 				var portTypeNode = wsdlDefNode.getElementsByTagName("portType")[0];
-			    var result = new treeLib.Tree(getNodeData(portTypeNode));  
-			    addChildTree(result._root,portTypeNode,childrenName,grandChildrenName);
-				return result._root;
+				return getTree(portTypeNode,childrenName,grandChildrenName);	
 			} catch(e) {
 				throw appMessage.allocateError(e, MODULE_TAG, 'getPortTypeTreeInfo', false);
 			}
@@ -164,33 +189,35 @@ function(soapWsdlProvider) {
 		/*
 		 * @return message nodes tree attributes info ! 
 		 * @param operationName 
-		 * @param childOpeNodeTag : imput or output | Help to get de correct message
+		 * @param opeChildNodeTag : imput or output | Help to get de correct message
 		 */
-		function getMessageTreeInfo(operationName, childOpeNodeTag){
+		function getMessageTreeInfo(operationName, opeChildNodeTag){
 			try {	
-				var messageName = getName(getOpeMsgAttribValue(operationName, childOpeNodeTag), ':', null);
+				var messageName = getName(getOpeMsgAttribValue(operationName, opeChildNodeTag), ':', null);
 				var messageNode = getNodeByAttribute(wsdlDefNode, 'name', messageName);
-				var result = new treeLib.Tree(getNodeData(messageNode)); 
-				addChildTree(result._root,messageNode,null);		
-				return result._root;
+				return getTree(messageNode,null,null);	
 			} catch(e) {
 				throw appMessage.allocateError(e, MODULE_TAG, 'getMessageTreeInfo', false);
 			}
 		}
 		//END OF USED BY soapService---------------
 		
-		//USED BY directivesDataP:---------------
-		function isSimpleType(type){
+		//USED BY directivesDataP:-----------------
+		//TODO to generalize: consider a more complex analysis with xlmns values
+		function isSimpleType(wsdlType){
 			try {
-				
+				if(isType(wsdlType, 'xsd') || isWithoutPrefixe(wsdlType))
+					return true;
+				return false;	
 			} catch(e) {
 				throw appMessage.allocateError(e, MODULE_TAG, 'isSimpleType', false);
 			}
 		}
 		
-		function getComplexTypeTreeInfo(name){
+		function getComplexTypeTreeInfo(wsdlType,suffixValue){
 			try {
-				
+				var complexTypeNode = getComplexTypeNode(getName(wsdlType, ':', suffixValue));
+				return getTree(complexTypeNode,null,null);
 			} catch(e) {
 				throw appMessage.allocateError(e, MODULE_TAG, 'getComplexTypeTreeInfo', false);
 			}
@@ -212,12 +239,12 @@ function(soapWsdlProvider) {
 			}
 			
 			//USED BY directivesDataP:---------------
-			isSimpleType : function(type) {
-				return isSimpleType(type);
+			isSimpleType : function(wsdlType) {
+				return isSimpleType(wsdlType);
 			}
 			
-			getComplexTypeTreeInfo : function(name) {
-				return getComplexTypeTreeInfo(name);
+			getComplexTypeTreeInfo : function(wsdlType) {
+				return getComplexTypeTreeInfo(wsdlType);
 			}
 		};
 
