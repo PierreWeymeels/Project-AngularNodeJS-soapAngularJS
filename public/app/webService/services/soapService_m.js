@@ -11,10 +11,10 @@ function($log, appMessage, directivesDataP, soapRequest, wsdlDataP, soapMessage)
 	function getWebService(wsdl) {
 		try {
 			if (wsdlDataP.initializeWsdl(wsdl)) {
-				var pttData	= wsdlDataP.getPortTypeTreeInfo('operation','documentation');
+				var wsdlPortTypeTree = wsdlDataP.getPortTypeTreeInfo('operation','documentation');
 				return {
 					'error' : false,
-					'data' : directivesDataP.getTableData(pttData)
+					'data' : directivesDataP.getTableData(wsdlPortTypeTree)
 				};
 			}
 		} catch(e) {
@@ -27,10 +27,10 @@ function($log, appMessage, directivesDataP, soapRequest, wsdlDataP, soapMessage)
 
 	function getMsgRequestInfo(operationName) {
 		try {
-			var wsdlMsgInfo = wsdlDataP.getMessageTreeInfo(operationName, 'input');
+			var wsdlMsgTree = wsdlDataP.getMessageTreeInfo(operationName, 'input');
 			return {
 				'error' : false,
-				'data' : directivesDataP.getOperationFormsData(operationName, wsdlMsgInfo)
+				'data' : directivesDataP.getOperationFormsData(operationName, wsdlMsgTree)
 			};
 		} catch(e) {
 			return {

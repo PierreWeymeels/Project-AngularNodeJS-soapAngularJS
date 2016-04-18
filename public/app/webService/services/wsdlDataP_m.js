@@ -64,7 +64,7 @@ function(soapWsdlProvider) {
 		function getTree(parentXmlNode,childrenName,grandChildrenName){
 			var result = new treeLib.Tree(getNodeData(parentXmlNode)); 
 			addChildTree(result._root,parentXmlNode,childrenName,grandChildrenName);
-			return result._root;
+			return result;
 		}
 		
 		function addChildTree(parentTreeNode,parentXmlNode,childrenName,grandChildrenName){
@@ -81,6 +81,9 @@ function(soapWsdlProvider) {
 			}
 		}
 		
+		/* 
+		 * work with wsdlType and xmlType ! 
+	     */
 		function getName(value, prefixSeparator, suffixValue) {
 			var name = value;
 			if (prefixSeparator !== null) {
@@ -135,6 +138,45 @@ function(soapWsdlProvider) {
 					return result;
 			}
 			throw new appMessage.ExceptionMsg(MODULE_TAG, 'getComplexTypeNode', 'complexTypeNode: ' + nameValue + ' = null');
+		}
+		
+		//TODO with xmlns analysis !!!
+		function getRestrictionValue(restrictionNode){
+			var base = getNodeAttributeValue(attributesNode, 'base');
+			var restriction = getName(base, ':', null);
+			return restriction;
+						
+		}
+		
+		/*
+		 * @return {'type': xsd type (string) || complexTypeName, 'isSimple': boolean} 
+		 * 
+		 * TODO generalize this with xmlns analysis !!!
+		 */
+		function getTypeOfAttributeNode(attributesNode,restrictionValue){
+			if(restrictionValue.localeCompare('Array') ===0)
+			  var suffixe = '[]';
+			else
+			  throw  new appMessage.ExceptionMsg(MODULE_TAG, 'getTypeOfAttributeNode', 'Unsupported restrictionValue !'); 
+			var ref = getNodeAttributeValue(attributesNode, 'ref');
+			var name = 'wsdl:'+ref.getSuffix(':');
+			var wsdlType = getNodeAttributeValue(attributesNode, name);
+			return {'type': isSimpleType(wsdlType), 'isSimple': getName(wsdlType, ':', suffixe)} ;
+		}
+		
+		function getNodeAttributeValue(node, name) {
+			var attribute = node.getAttributeNode(name);
+			return attribute.value;
+		}
+		
+		function getPrefix(prefixSeparator){
+			var result =  this.split(prefixSeparator);
+			return result[0];
+		}
+		
+		function getSuffix(prefixSeparator){
+			var result =  this.split(prefixSeparator);
+			return result[result.length-1];
 		}
 		//END OF PRIVATE METHODS-------------------------------------------------------------
 
@@ -214,6 +256,9 @@ function(soapWsdlProvider) {
 			}
 		}
 		
+		/* 
+		 * work with wsdlType and xmlType ! 
+	     */
 		function getComplexTypeTreeInfo(wsdlType,suffixValue){
 			try {
 				var complexTypeNode = getComplexTypeNode(getName(wsdlType, ':', suffixValue));
@@ -222,6 +267,32 @@ function(soapWsdlProvider) {
 				throw appMessage.allocateError(e, MODULE_TAG, 'getComplexTypeTreeInfo', false);
 			}
 		}	
+		
+		/*
+		 * TODO MUST BE GENERALIZE !!!
+		 * 
+		 * @return {'restrictValue': string , 'type': xsd simple type || complexTypeName , 
+		 *          'isSimple': true || false};
+		 * 
+		 * don't call this method without check if complexType has one restriction node !
+		 * it is assumed that only one restriction 
+		 * and one attribute xmlNode inside a complexTypeNode xmlNode.
+		 */
+		function getRestrictAndTypeOfAttribute(complexTypeName){
+			try {
+				var complexTypeNode = getComplexTypeNode(complexTypeName);
+				var restrictionsNode = complexTypeNode.getElementsByTagName("restriction");
+				var attributesNode = restrictionNode.getElementsByTagName("attribute");
+				if((restrictionsNode.length === 1) && (attributesNode.length === 1)){
+					var restriction = getRestrictionValue(restrictionsNode);
+					var typeOfAttrib = getTypeOfAttributeNode(attributesNode);
+					return {'restrictValue': restriction, 'type': typeOfAttrib.type, 'isSimple': typeOfAttrib.isSimple};
+				}else
+					throw {'message': 'Unsupported No or more than one restriction-node/attribute-node !!!'};
+			} catch(e) {
+				throw appMessage.allocateError(e, MODULE_TAG, 'getRestrictAndTypeOfAttribute', false);
+			}
+		}
 		//END OF USED BY directivesDataP---------------
 		//END OF PUBLIC METHODS------------------------------------------------------------------
 
@@ -236,16 +307,21 @@ function(soapWsdlProvider) {
 			},
 			getMessageTreeInfo : function(operationName, childNodeTag) {
 				return getMessageTreeInfo(operationName, childNodeTag);
-			}
+			},
 			
 			//USED BY directivesDataP:---------------
 			isSimpleType : function(wsdlType) {
 				return isSimpleType(wsdlType);
+			},
+			
+			getComplexTypeTreeInfo : function(wsdlType, suffixValue) {
+				return getComplexTypeTreeInfo(wsdlType, suffixValue);
+			},
+			
+			getRestrictAndTypeOfAttribute: function(complexTypeName){
+				return getRestrictAndTypeOfAttribute(complexTypeName);
 			}
 			
-			getComplexTypeTreeInfo : function(wsdlType) {
-				return getComplexTypeTreeInfo(wsdlType);
-			}
 		};
 
 	}];

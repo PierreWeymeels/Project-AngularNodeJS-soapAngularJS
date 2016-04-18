@@ -1,6 +1,8 @@
 /* Here we are talking about node of Tree definition 
  * and NodeData class define in soapWsdl for node.data.  
  * Not about xml node !!!
+ * So wsdl...Tree are tree type info and not a part of wsdl file!
+ * wsdlValue means with prefix:suffix
  */
 angular.module('directivesDataP_m', [])
 
@@ -30,12 +32,98 @@ function(appMessage, $log, wsdlDataP) {
 		var result = new PartInfo(getAttributeValue('name', partAttributes));
 		var wsdlType = getAttributeValue('type', partAttributes);
 		if(wsdlDataP.isSimpleType(wsdlType))
-			result.element = getImputInfo(result.name, wsdlType);
-		else  
-			result.form = getFormInfo(wsdlDataP.getComplexTypeTreeInfo(wsdlType, null));
+			result.imput = getImputInfo(result.name, wsdlType);
+		else {
+			var form = new FormInfo();
+			setFormInfo(form, wsdlDataP.getComplexTypeTreeInfo(wsdlType, null));
+			result.form = form;
+		} 
+			
 		return result;
 	}
 	
+	//Recurcive method
+	function setFormInfo(form, wsdlComTypTree){
+		try{	
+			var extension = existAndGetFirstNode(wsdlComTypTree, 'extension');
+			if(extension.exist){
+				var wsdlbaseValue = getAttributeValue('base', extension.node.data.attributes);
+				wsdlComTypTree = wsdlDataP.getComplexTypeTreeInfo(wsdlbaseValue, null);
+				//recall:
+				setFormInfo(form, wsdlComTypTree); 
+			}else{
+				var restriction = existAndGetFirstNode(wsdlComTypTree, 'restriction');
+				if(restriction.exist){
+					var complexTypeName = getAttributeValue('name',wsdlComTypTree._root.data.attributes);
+					var result = wsdlDataP.getRestrictAndTypeOfAttribute(complexTypeName);
+					form.restrictSequence.push(result.restrictValue);
+					if(result.isSimple){
+						form.name = getAttributeValue('name', wsdlComTypTree._root.data.attributes);
+						form.imputs.push(getImputInfo(result.type,result.type));
+					}else{
+						wsdlComTypTree = wsdlDataP.getComplexTypeTreeInfo(result.type, null);
+						//recall:
+						setFormInfo(form, wsdlComTypTree);
+					}
+				
+				}else{
+					//TODO getIMPUTS	form.imputs
+					form.name = getAttributeValue('name', wsdlComTypTree._root.data.attributes);
+					var elementsNode = getNodes(wsdlComTypTree,'element');
+					for (var i=0; i < elementsNode.length; ++i) {
+						var elementAttributes = elementsNode[i].data.attributes;
+						var wsdlElemType = getAttributeValue('type',elementAttributes);
+						if(wsdlDataP.isSimpleType(wsdlElemType)){
+							form.imputs.push(getImputInfo(elementAttributes));
+						}else{
+							var subForm = new FormInfo();
+							var subWsdlComTypTree = wsdlDataP.getComplexTypeTreeInfo(wsdlElemType, null);
+							//recall:
+							setFormInfo(subForm, subWsdlComTypTree);
+							form.forms.push(subForm);
+						}		
+					}
+				}
+			}
+		} catch(e) {
+	    	throw appMessage.allocateError(e, MODULE_TAG, 'setFormInfo', false);
+		}
+	}
+	
+	function getNodes(tree, nodeName){
+		try{
+			var result = [];
+			tree.contains(
+				function(node){
+				  if(node.data.name === nodeName){
+				  	result.push(node);
+				},tree.traverseBF
+			);
+			return result;
+		} catch(e) {
+	    	throw appMessage.allocateError(e, MODULE_TAG, 'getNodes', false);
+		}	
+	
+	function existAndGetFirstNode(tree, nodeName){
+		try{
+			//!!! no declared var node could throw exception !!!
+			var result = {'exist': false, 'node': null};
+			tree.contains(
+				function(node){
+				  if(node.data.name === nodeName){
+				  	return {'exist': true, 'node': node};//TODO CHECK if this callback doesn't go on after !
+				},tree.traverseBF
+			);
+			return result;	
+		} catch(e) {
+	    	throw appMessage.allocateError(e, MODULE_TAG, 'existAndGetFirstNode', false);
+		}
+	}
+	
+	/*
+	 * only for simple type !!!
+	 * work with wsdlType and xmlType ! 
+	 */
 	function getImputInfo(name,wsdlType){
 		var result = new ImputInfo();
 		result.name = name;
@@ -43,18 +131,14 @@ function(appMessage, $log, wsdlDataP) {
 		return result;
 	}
 	
-	function getFormInfo(wsdlComplexTypeInfo){
-		var result = new FormInfo();
-		
-		return result;
-	}
-	
+	/*
+	 * only for simple type !!!
+	 */
 	function getImputInfo(attributes){
 		var result = new ImputInfo();		
-		var hasDefault = false;
-		var xmlType = getXmlType(wsdlType);
-		var wsdlType = getAttributeValue('type', attributes);	
-		setHtmlType(wsdlType,result); 		
+		var hasDefault = false;	
+		var wsdlType = getAttributeValue('type', attributes);		
+		setHtmlType(getXmlType(wsdlType),result);
 		for (var i = 0; i < attributes.length; ++i) {	
 			var name = attributes[i].name;
 			switch(name) {
@@ -157,16 +241,16 @@ function(appMessage, $log, wsdlDataP) {
 		var that = this;
 		that.name = name;
 		that.form = false;
-		that.element = false;
+		that.imput = false;
 	};
 	
 	function FormInfo(){
 		var that = this;
 		that.name = name;
-		that.restriction = false;
+		that.restrictSequence= [];
 		that.documentation = 'undocumented';
 		that.forms = [];
-		that.elements = [];
+		that.imputs = [];
 	}
 	
 	function ImputInfo(){
@@ -183,8 +267,9 @@ function(appMessage, $log, wsdlDataP) {
 	//END CLASSES ----------------------------------------------------------------
 
 	//PUBLIC METHODS--------------------------------------------------------------
-    function getTableData(wsdlWsInfo){ 
+    function getTableData(wsdlPortTypeTree){ 
 	    try{
+	    	var wsdlWsInfo = wsdlPortTypeTree._root;
 	    	var result = new webServiceInfo(getAttributeValue('name',wsdlWsInfo.data.attributes));
 			var wsdlOperations = wsdlWsInfo.children;
 			for (var i=0; i < wsdlOperations.length; ++i) {
@@ -198,8 +283,9 @@ function(appMessage, $log, wsdlDataP) {
 		}
 	}
 	
-	function getOperationFormsData(operationName, wsdlMsgInfo){
+	function getOperationFormsData(operationName, wsdlMsgTree){
 		try{
+			var wsdlMsgInfo = wsdlMsgTree._root;
 			var result = new MessageRequestInfo(operationName,getAttributeValue('name',wsdlMsgInfo.data.attributes));
 			var chidrenNodes = wsdlMsgInfo.children;
 			for (var i=0; i < chidrenNodes.length; ++i) {
@@ -219,11 +305,11 @@ function(appMessage, $log, wsdlDataP) {
 
 	//INTERFACE-----------------------------------------------------------------------
 	return {
-		getTableData: function(wsdlWsInfo){
-			return getTableData(wsdlWsInfo);
+		getTableData: function(wsdlPortTypeTree){
+			return getTableData(wsdlPortTypeTree);
 		},
-		getOperationFormsData: function(wsdlMsgInfo){
-			return getOperationFormsData(wsdlMsgInfo);
+		getOperationFormsData: function(wsdlMsgTree){
+			return getOperationFormsData(wsdlMsgTree);
 		}
 		
 		
