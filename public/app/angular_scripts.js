@@ -10,7 +10,7 @@ module.exports = function (app, express) {
 				'/home/controllers/homeC_m.js',
 				'/webService/controllers/webServiceC_m.js',
 				'/webService/directives/fileDialog_m.js','/webService/directives/operationsTable_m.js',
-				'/webService/directives/operationForms_m.js','/webService/directives/operationForm_m.js', 
+				'/webService/directives/messageParts_m.js','/webService/directives/messageForm_m.js', 
 				'/webService/directives/accordion_m.js',
 				'/webService/services/directivesDataP_m.js',
 				'/webService/services/soapService_m.js','/webService/services/wsdlDataP_m.js', 

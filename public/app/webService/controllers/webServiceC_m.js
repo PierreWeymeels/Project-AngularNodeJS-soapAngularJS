@@ -8,7 +8,7 @@ function(soapService, $log, $scope) {
 	
 	vm.initialized = false;
 	vm.tableVisibility = false;
-	vm.formsVisibility = false;
+	vm.msgVisibility = false;
 	
 	vm.fileName = null;
 
@@ -31,13 +31,13 @@ function(soapService, $log, $scope) {
 		var parser = new DOMParser();
 		var xmlDom = parser.parseFromString(file, "text/xml");
 		//$log.debug('file:   ', xmlDom);
-		initializeOpeTable(xmlDom,true); 
+		initializeOpeTable(xmlDom,true); //true= outside Angular because $emit called by reader event listener
 	});
 	
 	$scope.$on('operationRequest', function(evt,operationName) {
 		evt.stopPropagation();
 		//TODO somethink
-		operationRequest(operationName,true);
+		operationRequest(operationName,false);//false= inside Angular because $emit called by angular scope method
 	});
 	
 	$scope.$watch(function() {
@@ -59,16 +59,16 @@ function(soapService, $log, $scope) {
 		}
 	}
 	
-	vm.formAction = function(action) {
+	vm.msgAction = function(action) {
 		switch(action) {
 		case 'submit':
-			//formSubmit();
+			//msgSubmit();
 			break;
 		case 'reset':
-			//vm.respForm = miriadeFormMS.getFormDefaultResp();
+			//
 			break;
 		case 'back':
-			vm.formsVisibility = false;
+			vm.msgVisibility = false;
 			vm.tableVisibility = true;
 		}
 	}
@@ -91,7 +91,7 @@ function(soapService, $log, $scope) {
 		if (!result.error) {
 			vm.msgRequestInfo = result.data;
 			vm.tableVisibility = false;
-			vm.formsVisibility = true;
+			vm.msgVisibility = true;
 		}else
 			vm.errorMsg = result.data;
 		launchDigest(outsideAng);

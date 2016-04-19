@@ -26,6 +26,6 @@
 	<data-operations-table ng-if= 'wsC.tableVisibility' data-info= 'wsC.webServiceInfo' data-back='wsC.tableAction("back")'>
 	</data-operations-table>
 	
-	<data-operation-forms ng-if="wsC.formsVisibility" data-info='wsC.msgRequestInfo' data-submit='wsC.formAction("submit")' data-back='wsC.formAction("back")'>
-	</data-operation-forms>
+	<data-message-parts ng-if="wsC.msgVisibility" data-info='wsC.msgRequestInfo' data-submit='wsC.msgAction("submit")' data-back='wsC.msgAction("back")'>
+	</data-message-parts>
 </div>

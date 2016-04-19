@@ -1,15 +1,18 @@
 <div class='fAccordion well well-sm'>
 	<a href ng-click='toggle()'><h5 class="bg-info text-danger bordered">{{formInfo.name}} form</h5></a>
+	<h6 class="bg-info text-danger bordered">{{formInfo.documentaion}}</h6>
+	<div class="well-sm row"><div class="well-sm" ng-repeat="restriction in formInfo.restrictSeq">{{restriction}}</div></div>
+	
 	<form ng-show='visible' role="form" class=" animate-if" name="myForm" ng-submit='formSubmit()' novalidate>
 		<div class="form-inline ">
-			<div class="form-group well-sm" ng-repeat="inputI in formInfo.imputsInfo">
+			<div class="form-group well-sm" ng-repeat="inputI in formInfo.imputs">
 				<label class="control-label text-primary " for="input_{{inputI.name}}" >{{inputI.name}}:</label>
 
 				<div ng-class="{'has-error': myForm[inputI.name].$invalid, 'has-success': !myForm[inputI.name].$invalid}">
 					<input class="form-control" id="input_{{inputI.name}}"
 					aria-describedby="helpBlock_{{inputI.name}}" name="{{inputI.name}}" type="{{inputI.type}}"
 					ng-model='respForm[inputI.name]' ng-required="{{inputI.required}}" >
-					<!--ng-pattern="input.format"   -->
+					<!-- value="{{inputI.value}}" ng-pattern="input.format"  step="{{inputI.step}}" -->
 					</input>
 
 					<div ng-if='myForm[inputI.name].$invalid' role="alert" ng-messages= 'myForm[inputI.name].$error'>

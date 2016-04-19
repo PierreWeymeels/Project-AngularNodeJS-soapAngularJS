@@ -14,7 +14,7 @@ function($log, appMessage, directivesDataP, soapRequest, wsdlDataP, soapMessage)
 				var wsdlPortTypeTree = wsdlDataP.getPortTypeTreeInfo('operation','documentation');
 				return {
 					'error' : false,
-					'data' : directivesDataP.getTableData(wsdlPortTypeTree)
+					'data' : directivesDataP.getOpeTableData(wsdlPortTypeTree)
 				};
 			}
 		} catch(e) {
@@ -30,7 +30,7 @@ function($log, appMessage, directivesDataP, soapRequest, wsdlDataP, soapMessage)
 			var wsdlMsgTree = wsdlDataP.getMessageTreeInfo(operationName, 'input');
 			return {
 				'error' : false,
-				'data' : directivesDataP.getOperationFormsData(operationName, wsdlMsgTree)
+				'data' : directivesDataP.getMsgPartsData(operationName, wsdlMsgTree)
 			};
 		} catch(e) {
 			return {
