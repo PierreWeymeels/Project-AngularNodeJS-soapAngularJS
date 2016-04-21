@@ -28,7 +28,7 @@ function(appMessage, $log, wsdlDataP) {
 	function getAttributeValue(attributeName,attributes) {
 		try{
 			for (var i=0; i < attributes.length; ++i) {
-				if(attributes[i].name.localeCompare(attributeName) === 0)
+				if(attributes[i].name.indexOf(attributeName) > -1)
 				  return attributes[i].value;
 			}
 			return 'undefined'; //TODO change the model to accept undefined without quote to throw error when necessary ! 
@@ -73,38 +73,39 @@ function(appMessage, $log, wsdlDataP) {
 	function setFormInfo(form, wsdlComTypTree){
 		try{	
 			var extension = existAndGetFirstNode(wsdlComTypTree, 'extension');
-			if(extension.exist){
+			if(extension.exist){// EXTENSION NODE =>
 				var wsdlbaseValue = getAttributeValue('base', extension.node.data.attributes);
 				wsdlComTypTree = wsdlDataP.getComplexTypeTreeInfo(wsdlbaseValue);//, null);
 				//recall:
 				setFormInfo(form, wsdlComTypTree); 
 			}else{
 				var restriction = existAndGetFirstNode(wsdlComTypTree, 'restriction');
-				if(restriction.exist){
+				if(restriction.exist){// RESTRICTION NODE =>
 					var complexTypeName = getAttributeValue('name',wsdlComTypTree._root.data.attributes);
 					var result = wsdlDataP.getRestrictAndTypeOfAttribute(complexTypeName);
 					form.restrictSeq.push(result.restrictValue);
-					if(result.isSimple){
+					if(result.isSimple){ // SIMPLE TYPE =>
 						form.name = getAttributeValue('name', wsdlComTypTree._root.data.attributes);
 						form.imputs.push(getImputInfo(result.type,result.type));
-					}else{
+					}else{ // COMPLEX TYPE =>
 						wsdlComTypTree = wsdlDataP.getComplexTypeTreeInfo(result.type);//, null);
 						//recall:
 						setFormInfo(form, wsdlComTypTree);
 					}
 				
-				}else{
+				}else{ // NO RESTRICION NODE =>
 					//TODO getIMPUTS	form.imputs
 					form.name = getAttributeValue('name', wsdlComTypTree._root.data.attributes);
+					form.documentation = getFormDocumentation(wsdlComTypTree);
 					var elementsNode = getNodes(wsdlComTypTree,'element');
 					for (var i=0; i < elementsNode.length; ++i) {
 						var elementAttributes = elementsNode[i].data.attributes;
 						var wsdlElemType = getAttributeValue('type',elementAttributes);
-						if(wsdlDataP.isSimpleType(wsdlElemType)){
+						if(wsdlDataP.isSimpleType(wsdlElemType)){ // SIMPLE TYPE ELEMENT
 							var imput = getImputInfo(elementAttributes);
 							form.defaultImputsResp[imput.name] = imput.value;	
 							form.imputs.push(imput);
-						}else{
+						}else{ // COMPLEX TYPE ELEMENT
 							var subForm = new FormInfo();
 							var subWsdlComTypTree = wsdlDataP.getComplexTypeTreeInfo(wsdlElemType);//, null);
 							//recall:
@@ -119,12 +120,23 @@ function(appMessage, $log, wsdlDataP) {
 		}
 	}
 	
+	function getFormDocumentation(tree){
+		try{
+			var docu = existAndGetFirstNode(tree,"documentation");
+			if(docu.exist)
+				return getDocumentation(docu.node,false);
+			return 'undocumented';	
+		} catch(e) {
+	    	throw appMessage.allocateError(e, MODULE_TAG, 'getFormDocumentation', false);
+		}
+	}
+	
 	function getNodes(tree, nodeName){
 		try{
 			var result = [];
 			tree.contains(
 				function(node){
-				  if(node.data.name === nodeName)
+				  if(node.data.name.indexOf(nodeName) > -1)
 				  	result.push(node);
 				},tree.traverseBF
 			);
@@ -140,8 +152,8 @@ function(appMessage, $log, wsdlDataP) {
 			var result = {'exist': false, 'node': null};
 			tree.contains(
 				function(node){
-				  if(node.data.name === nodeName)
-				  	return {'exist': true, 'node': node};//TODO CHECK if this callback doesn't go on after !
+				  if( (node.data.name.indexOf(nodeName) > -1) && !result.exist)
+				  	result = {'exist': true, 'node': node};//TODO !!! The callback go on after return and break not allowed !    	
 				},tree.traverseBF
 			);
 			return result;	
@@ -159,7 +171,7 @@ function(appMessage, $log, wsdlDataP) {
 	function getImputInfo(attributes,name,wsdlType){
 		try{
 			var result = new ImputInfo();	
-			if((typeof name !== undefined)&&(typeof wsdlType !== undefined)){
+			if((typeof name !== 'undefined')&&(typeof wsdlType !== 'undefined')){
 				result.name = name;
 				setHtmlType(getXmlType(wsdlType),result);
 				return result;

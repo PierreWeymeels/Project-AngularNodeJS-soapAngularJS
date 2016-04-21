@@ -28,14 +28,39 @@ function(soapWsdlProvider) {
 	function($log, appMessage) {
 		//PRIVATE VARIABLES----------------------------------------------------------
 		var MODULE_TAG = 'wsdlDataP_m';
-		var wsdlDefNode = null;
 		var treeLib = this.treeLib;
+		
+		var wsdlDefNode = null;
 
 		//PRIVATE METHODS------------------------------------------------------------
 		function getSoapBindingValue(attribute) {
 			var bindingNode = wsdlDefNode.getElementsByTagName("binding")[0];
 			var soapBindingNode = bindingNode.getElementsByTagName("binding")[0];
 			return soapBindingNode.getAttribute(attribute);
+		}
+		
+		function getXmlnsCollection(node,defaultNs) {
+			try{
+				var attributes = node.attributes;
+				var result = [];
+				for (var i = 0; i < attributes.length; ++i) {
+					var attr = attributes[i];
+					if ( (defaultNs) ? (attr.name.localeCompare('xmlns') === 0) : 
+						 (attr.name.indexOf("xmlns") === 0) )
+						result[i] = new XmlnsInfo(attr.name, attr.value);
+				}
+				return result;
+			} catch(e) {
+	    		throw appMessage.allocateError(e, MODULE_TAG, 'getXmlnsCollection', false);
+		    }	
+		}
+		
+		function getDefaultXmlns(node){
+			var nodeDefaultXmlns = getXmlnsCollection(node,true);
+			if(nodeDefaultXmlns.length === 0){
+				return getXmlnsCollection(wsdlDefNode,true);
+			}
+			return nodeDefaultXmlns;
 		}
 		
 		function getNodeData(node){
@@ -148,11 +173,11 @@ function(soapWsdlProvider) {
 				for (var i = 0; i < schemaNodes.length; ++i) {
 					result = getNodeByAttribute(schemaNodes[i], 'name', nameValue);
 					if (result !== null)
-						return result;
+						return result ;
 				}
 				throw {'message':'complexTypeNode: ' + nameValue + ' = null'};
 			} catch(e) {
-	    		throw appMessage.allocateError(e, MODULE_TAG, 'getComplexTypeNode', false);
+	    		throw appMessage.allocateError(e, MODULE_TAG, 'getComplexTypeAndSchemaNode', false);
 		    }	
 		}
 		
@@ -201,6 +226,12 @@ function(soapWsdlProvider) {
 		//END OF PRIVATE METHODS-------------------------------------------------------------
 
 		//CLASSES ---------------------------------------------------------------------------
+		function XmlnsInfo(prefix, url) {
+			var that = this;
+			that.prefix = prefix;
+			that.url = url;
+		}
+		
 		function NodeData(name, attributes) {
 			var that = this;
 			that.name = name;
@@ -277,11 +308,12 @@ function(soapWsdlProvider) {
 		
 		/* 
 		 * work with wsdlType and xmlType ! 
+		 * @return tree
 	     */
 		function getComplexTypeTreeInfo(wsdlType,suffixValue){
 			try {
-				var complexTypeNode = getComplexTypeNode(getName(wsdlType, ':', suffixValue));
-				return getTree(complexTypeNode,null,null);
+				var result = getComplexTypeNode(getName(wsdlType, ':', suffixValue));
+				return  getTree(result,null,null);
 			} catch(e) {
 				throw appMessage.allocateError(e, MODULE_TAG, 'getComplexTypeTreeInfo', false);
 			}
@@ -299,7 +331,7 @@ function(soapWsdlProvider) {
 		 */
 		function getRestrictAndTypeOfAttribute(complexTypeName){
 			try {
-				var complexTypeNode = getComplexTypeNode(complexTypeName);
+				var complexTypeNode = getComplexTypeAndSchemaNode(complexTypeName);
 				var restrictionsNode = complexTypeNode.getElementsByTagName("restriction");
 				var attributesNode = restrictionNode.getElementsByTagName("attribute");
 				if((restrictionsNode.length === 1) && (attributesNode.length === 1)){
