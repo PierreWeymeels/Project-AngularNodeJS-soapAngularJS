@@ -1,5 +1,6 @@
 angular.module('appMessage_m', []).factory('appMessage', ['$log',
 function($log) {
+    var queue = [];
 
 	var ExceptionMsg = function(module, method, message) {
 		var that = this;
@@ -8,7 +9,7 @@ function($log) {
 		that.message = message;
 
 		if (!ExceptionMsg.prototype._toString) {
-			ExceptionMsg.prototype._toString = function() {
+			ExceptionMsg.prototype.toString = function() {
 				//this instead that because that will be the first instance of the class !
 				return 'module: ' + this.module 
 					+ ' | method: ' + this.method 
@@ -24,35 +25,41 @@ function($log) {
 		that.type = type;
 		that.message = message;
 
-		if (!UserMsg.prototype._toString) {
-			UserMsg.prototype._toString = function() {
+		if (!UserMsg.prototype.toString) {
+			UserMsg.prototype.toString = function() {
 				return 'type: ' + this.type + ' | message: ' + this.message;
 			};
 		}
 		return that;
 	};
 	
-	function allocateError(e, MODULE_TAG, method, terminal) {
+	function allocateError(e, MODULE_TAG, method,terminal) {
 		if ( e instanceof UserMsg)
-			return (terminal) ? e._toString() : e;      
+			return (terminal) ? e.toString() : e;      
 		else {
-			if (!( e instanceof ExceptionMsg))
-				e = new ExceptionMsg(MODULE_TAG, method, e.message);
-			$log.error(e._toString());
-			var userMsg = new UserMsg('fatal error', 'from soap service');
-			
+			var err = (queue.length === 0) ? e.message : 'capture parent '+queue.length;
+			var errorStep = new ExceptionMsg(MODULE_TAG, method, err);
+			queue.push(errorStep.toString());
 			if(terminal){
-				
-			}else{
-				
+				launchError();
+				queue = [];
+				var userMsg = new UserMsg('fatal error', 'from soap service');
+				return userMsg.toString();
 			}
-			
-			//return (terminal) ? userMsg._toString() : userMsg;
+			return e;
 		}
+	}
+	
+	function launchError(){
+		var error = "";
+		for (var i=0; i < queue.length; ++i) {
+			error += queue[i]+'\n'; //Instead of queue.shift() because it is o(n)
+		}
+		$log.error(error);
 	}
 
 	return {
-		ExceptionMsg : ExceptionMsg,
+		//ExceptionMsg : ExceptionMsg,
 		
 		UserMsg : UserMsg,
 		

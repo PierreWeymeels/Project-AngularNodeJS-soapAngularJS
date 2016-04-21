@@ -13,10 +13,15 @@ function(appMessage, $log, wsdlDataP) {
 	var MODULE_TAG = 'directivesDataP_m';
 	
 	//PRIVATE METHODS------------------------------------------------------------
-	function getDocumentation(node) {
+	function getDocumentation(node,isParentNode) {
 		var result = null;
-		if(node.children.length === 1)
-		   result = node.children[0].data.text; 
+		if(isParentNode){
+			var children = node.children;
+			for (var i=0; i < children.length; ++i) 
+				if(children[i].data.name.localeCompare("documentation") === 0)
+					result = children[i].data.text; 						
+		}else
+			result = node.data.text;	 
 	    return (result === null) ? 'undocumented' : result;
 	}		
 	
@@ -40,8 +45,8 @@ function(appMessage, $log, wsdlDataP) {
 			if(wsdlDataP.isSimpleType(wsdlType))
 				setSimpleFormInfo(form, result.name, wsdlType);
 		 	else 
-				setFormInfo(form, wsdlDataP.getComplexTypeTreeInfo(wsdlType, null));
-			result.form.push(form);	
+				setFormInfo(form, wsdlDataP.getComplexTypeTreeInfo(wsdlType));//, null));
+			result.form = form; //.push(form);	
 			return result;
 		} catch(e) {
 	    	throw appMessage.allocateError(e, MODULE_TAG, 'getPartInfo', false);
@@ -50,9 +55,9 @@ function(appMessage, $log, wsdlDataP) {
 	
 	function setSimpleFormInfo(form,name,wsdlType){
 		try{
-			form.name = name+' simple form';
-			form.documentation = 'Part '+name+' simple form.';
-			var imput = getImputInfo(name, wsdlType);
+			form.name = name;
+			form.documentation = 'simple form';
+			var imput = getImputInfo(null, name, wsdlType);
 			form.defaultImputsResp[imput.name] = imput.value;	
 			form.imputs.push(imput);
 		} catch(e) {
@@ -70,7 +75,7 @@ function(appMessage, $log, wsdlDataP) {
 			var extension = existAndGetFirstNode(wsdlComTypTree, 'extension');
 			if(extension.exist){
 				var wsdlbaseValue = getAttributeValue('base', extension.node.data.attributes);
-				wsdlComTypTree = wsdlDataP.getComplexTypeTreeInfo(wsdlbaseValue, null);
+				wsdlComTypTree = wsdlDataP.getComplexTypeTreeInfo(wsdlbaseValue);//, null);
 				//recall:
 				setFormInfo(form, wsdlComTypTree); 
 			}else{
@@ -83,7 +88,7 @@ function(appMessage, $log, wsdlDataP) {
 						form.name = getAttributeValue('name', wsdlComTypTree._root.data.attributes);
 						form.imputs.push(getImputInfo(result.type,result.type));
 					}else{
-						wsdlComTypTree = wsdlDataP.getComplexTypeTreeInfo(result.type, null);
+						wsdlComTypTree = wsdlDataP.getComplexTypeTreeInfo(result.type);//, null);
 						//recall:
 						setFormInfo(form, wsdlComTypTree);
 					}
@@ -101,7 +106,7 @@ function(appMessage, $log, wsdlDataP) {
 							form.imputs.push(imput);
 						}else{
 							var subForm = new FormInfo();
-							var subWsdlComTypTree = wsdlDataP.getComplexTypeTreeInfo(wsdlElemType, null);
+							var subWsdlComTypTree = wsdlDataP.getComplexTypeTreeInfo(wsdlElemType);//, null);
 							//recall:
 							setFormInfo(subForm, subWsdlComTypTree);
 							form.forms.push(subForm);
@@ -147,54 +152,48 @@ function(appMessage, $log, wsdlDataP) {
 	
 	/*
 	 * only for simple type !!!
-	 * work with wsdlType and xmlType ! 
+	 * work with wsdlType and xmlType !
+	 * @param (null,name,wsdlType) || (attributes)
+	 *        
 	 */
-	function getImputInfo(name,wsdlType){
+	function getImputInfo(attributes,name,wsdlType){
 		try{
-			var result = new ImputInfo();
-			result.name = name;
-			setHtmlType(getXmlType(wsdlType),result);
-			return result;
-		} catch(e) {
-	    	throw appMessage.allocateError(e, MODULE_TAG, 'getImputInfo(name,wsdlType)', false);
-		}
-	}
-	
-	/*
-	 * only for simple type !!!
-	 */
-	function getImputInfo(attributes){
-		try{
-			var result = new ImputInfo();		
-			var hasDefault = false;	
-			var wsdlType = getAttributeValue('type', attributes);		
-			setHtmlType(getXmlType(wsdlType),result);
-			for (var i = 0; i < attributes.length; ++i) {	
-				var name = attributes[i].name;
-				switch(name) {
-					case 'minOccurs':
-						result.required = (attributes[i].value == 1);
-						break;
-					case 'default':
-						result.value = 
-							getDefaultValue(attributes[i].value, result.type);
-						hasDefault = true;
-						break;
-					default:
-						if (result.hasOwnProperty(name) && (name.localeCompare('type') !== 0))
-							result[name] = attributes[i].value;
+			var result = new ImputInfo();	
+			if((typeof name !== undefined)&&(typeof wsdlType !== undefined)){
+				result.name = name;
+				setHtmlType(getXmlType(wsdlType),result);
+				return result;
+			}else{	
+				var hasDefault = false;	
+				var wsdlType = getAttributeValue('type', attributes);			
+				setHtmlType(getXmlType(wsdlType),result);	
+				for (var i = 0; i < attributes.length; ++i) {	
+					var name = attributes[i].name;
+					switch(name) {
+						case 'minOccurs':
+							result.required = (attributes[i].value == 1);
+							break;
+						case 'default':
+							result.value = 
+								getDefaultValue(attributes[i].value, result.type);
+							hasDefault = true;
+							break;
+						default:
+							if (result.hasOwnProperty(name) && (name.localeCompare('type') !== 0))
+								result[name] = attributes[i].value;
+					}
 				}
+				if(!hasDefault)
+					result.value = getDefaultValue(null, result.type);
+				return result;
 			}
-			if(!hasDefault)
-				result.value = getDefaultValue(null, result.type);
-			return result;
 		} catch(e) {
-	    	throw appMessage.allocateError(e, MODULE_TAG, 'getImputInfo(attributes)', false);
+	    	throw appMessage.allocateError(e, MODULE_TAG, 'getImputInfo', false);
 		}
 	}
 	
 	function getXmlType(wsdlType){
-		var type = wsldType.split(":");
+		var type = wsdlType.split(":");
 		return type[type.length - 1];
 	}
 	
@@ -273,7 +272,7 @@ function(appMessage, $log, wsdlDataP) {
 	function PartInfo(name) {
 		var that = this;
 		that.name = name;
-		that.form = [];
+		that.form = null;
 	};
 	
 	function FormInfo(){
@@ -307,7 +306,7 @@ function(appMessage, $log, wsdlDataP) {
 			var wsdlOperations = wsdlWsInfo.children;
 			for (var i=0; i < wsdlOperations.length; ++i) {
 			  var name = getAttributeValue('name',wsdlOperations[i].data.attributes);	
-			  var documentation = getDocumentation(wsdlOperations[i]); 	
+			  var documentation = getDocumentation(wsdlOperations[i],true); 	
 			  result.operations[i] = new operationInfo(name,documentation);
 			}		
 			return result;
@@ -323,7 +322,7 @@ function(appMessage, $log, wsdlDataP) {
 			var chidrenNodes = wsdlMsgInfo.children;
 			for (var i=0; i < chidrenNodes.length; ++i) {
 				if(chidrenNodes[i].data.name.localeCompare('documentation') === 0){
-					result.documentation = getDocumentation(chidrenNodes[i]);
+					result.documentation = getDocumentation(chidrenNodes[i],false);
 				}else if(chidrenNodes[i].data.name.localeCompare('part') === 0){
 					result.parts.push(getPartInfo(chidrenNodes[i].data.attributes));
 				}else

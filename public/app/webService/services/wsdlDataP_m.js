@@ -62,40 +62,52 @@ function(soapWsdlProvider) {
 		}
 		
 		function getTree(parentXmlNode,childrenName,grandChildrenName){
-			var result = new treeLib.Tree(getNodeData(parentXmlNode)); 
-			addChildTree(result._root,parentXmlNode,childrenName,grandChildrenName);
-			return result;
+			try{
+				var result = new treeLib.Tree(getNodeData(parentXmlNode)); 
+				addChildTree(result._root,parentXmlNode,childrenName,grandChildrenName);
+				return result;
+			} catch(e) {
+	    		throw appMessage.allocateError(e, MODULE_TAG, 'getTree', false);
+		    }	
 		}
 		
 		function addChildTree(parentTreeNode,parentXmlNode,childrenName,grandChildrenName){
-			var childrenXmlNode;
-			if(childrenName !== null)
-			  childrenXmlNode = parentXmlNode.getElementsByTagName(childrenName);
-			else
-			  childrenXmlNode = parentXmlNode.children;
-			for (var i = 0; i < childrenXmlNode.length; ++i) {
-					parentTreeNode.addChild(getNodeData(childrenXmlNode[i]));
-					if (childrenXmlNode[i].children.length !==0){
-						addChildTree(parentTreeNode.children[i],childrenXmlNode[i],grandChildrenName,null)
-					}  
-			}
+			try{
+				var childrenXmlNode;
+				if(childrenName !== null)
+				  childrenXmlNode = parentXmlNode.getElementsByTagName(childrenName);
+				else
+				  childrenXmlNode = parentXmlNode.children;
+				for (var i = 0; i < childrenXmlNode.length; ++i) {
+						parentTreeNode.addChild(getNodeData(childrenXmlNode[i]));
+						if (childrenXmlNode[i].children.length !==0){
+							addChildTree(parentTreeNode.children[i],childrenXmlNode[i],grandChildrenName,null)
+						}  
+				}
+			} catch(e) {
+	    		throw appMessage.allocateError(e, MODULE_TAG, 'addChildTree', false);
+		    }	
 		}
 		
 		/* 
 		 * work with wsdlType and xmlType ! 
 	     */
 		function getName(value, prefixSeparator, suffixValue) {
-			var name = value;
-			if (prefixSeparator !== null) {
-				name = name.split(prefixSeparator);
-				name = name[name.length - 1];
-			}
-			if (suffixValue !== null) {
-				var suffixL = suffixValue.length;
-				var nameL = name.length;
-				name = name.substring(0, nameL - suffixL);
-			}
-			return name;
+			try{
+				var name = value;
+				if (prefixSeparator !== null) {
+					name = name.split(prefixSeparator);
+					name = name[name.length - 1];
+				}
+				if (suffixValue !== undefined) {
+					var suffixL = suffixValue.length;
+					var nameL = name.length;
+					name = name.substring(0, nameL - suffixL);
+				}
+				return name;
+			} catch(e) {
+	    		throw appMessage.allocateError(e, MODULE_TAG, 'getName', false);
+		    }	
 		}
 		
 		/*
@@ -130,20 +142,24 @@ function(soapWsdlProvider) {
 		
 		//TODO select by specific shema :
 		function getComplexTypeNode(nameValue) {
-			var result;
-			var schemaNodes = wsdlDefNode.getElementsByTagName("schema");
-			for (var i = 0; i < schemaNodes.length; ++i) {
-				result = getNodeByAttribute(schemaNodes[i], 'name', nameValue);
-				if (result !== null)
-					return result;
-			}
-			throw new appMessage.ExceptionMsg(MODULE_TAG, 'getComplexTypeNode', 'complexTypeNode: ' + nameValue + ' = null');
+			try{
+				var result;
+				var schemaNodes = wsdlDefNode.getElementsByTagName("schema");
+				for (var i = 0; i < schemaNodes.length; ++i) {
+					result = getNodeByAttribute(schemaNodes[i], 'name', nameValue);
+					if (result !== null)
+						return result;
+				}
+				throw {'message':'complexTypeNode: ' + nameValue + ' = null'};
+			} catch(e) {
+	    		throw appMessage.allocateError(e, MODULE_TAG, 'getComplexTypeNode', false);
+		    }	
 		}
 		
 		//TODO with xmlns analysis !!!
 		function getRestrictionValue(restrictionNode){
 			var base = getNodeAttributeValue(attributesNode, 'base');
-			var restriction = getName(base, ':', null);
+			var restriction = getName(base, ':');//, null);
 			return restriction;
 						
 		}
@@ -154,14 +170,18 @@ function(soapWsdlProvider) {
 		 * TODO generalize this with xmlns analysis !!!
 		 */
 		function getTypeOfAttributeNode(attributesNode,restrictionValue){
-			if(restrictionValue.localeCompare('Array') ===0)
-			  var suffixe = '[]';
-			else
-			  throw  new appMessage.ExceptionMsg(MODULE_TAG, 'getTypeOfAttributeNode', 'Unsupported restrictionValue !'); 
-			var ref = getNodeAttributeValue(attributesNode, 'ref');
-			var name = 'wsdl:'+ref.getSuffix(':');
-			var wsdlType = getNodeAttributeValue(attributesNode, name);
-			return {'type': isSimpleType(wsdlType), 'isSimple': getName(wsdlType, ':', suffixe)} ;
+			try{
+				if(restrictionValue.localeCompare('Array') ===0)
+				  var suffixe = '[]';
+				else
+				  throw  {'message':'Unsupported restrictionValue !'}; 
+				var ref = getNodeAttributeValue(attributesNode, 'ref');
+				var name = 'wsdl:'+ref.getSuffix(':');
+				var wsdlType = getNodeAttributeValue(attributesNode, name);
+				return {'type': isSimpleType(wsdlType), 'isSimple': getName(wsdlType, ':', suffixe)} ;
+			} catch(e) {
+	    		throw appMessage.allocateError(e, MODULE_TAG, 'getTypeOfAttributeNode', false);
+		    }	
 		}
 		
 		function getNodeAttributeValue(node, name) {
@@ -199,7 +219,6 @@ function(soapWsdlProvider) {
 		//USED BY soapService:-----------------
 		function initializeWsdl(newWsdl) {
 			try {
-				$log.debug('treeLib', treeLib);
 				wsdlDefNode = newWsdl.documentElement;
 				var style = getSoapBindingValue('style');
 				var transport = getSoapBindingValue('transport');
@@ -235,7 +254,7 @@ function(soapWsdlProvider) {
 		 */
 		function getMessageTreeInfo(operationName, opeChildNodeTag){
 			try {	
-				var messageName = getName(getOpeMsgAttribValue(operationName, opeChildNodeTag), ':', null);
+				var messageName = getName(getOpeMsgAttribValue(operationName, opeChildNodeTag), ':')//, null);
 				var messageNode = getNodeByAttribute(wsdlDefNode, 'name', messageName);
 				return getTree(messageNode,null,null);	
 			} catch(e) {

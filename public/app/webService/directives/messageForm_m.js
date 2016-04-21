@@ -18,7 +18,7 @@ function($log,$compile) {
 					//$log.debug("messageForm preLink",scope.formInfo);
 				},
 				post : function postLink(scope, element, attrs, accordionController) {
-					$log.debug("messageForm postLink", scope.formInfo);
+					//$log.debug("messageForm postLink", scope.formInfo);
 
 					//instead in template to avoid an angular throw into an endless loop,
 					//because it tries to render the operationForm directive
@@ -52,7 +52,7 @@ function($log,$compile) {
 		},
 		controller : ['$scope',
 		function(scope, $scope, $parent) {
-			$log.debug("operationForm controller",scope.formInfo);
+			//$log.debug("operationForm controller",scope.formInfo);
 			var vm = this;
 			vm.respForm = angular.copy(scope.formInfo.defaultImputsResp);
 		}],

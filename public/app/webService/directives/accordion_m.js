@@ -21,7 +21,7 @@ function($log) {
 		},
 		controller : ['$scope',
 		function(scope, $scope) {
-			$log.debug("accordion controller");
+			//$log.debug("accordion controller");
 			var accordionGroups = [];
 
 			this.registerGroup = function(group) {
