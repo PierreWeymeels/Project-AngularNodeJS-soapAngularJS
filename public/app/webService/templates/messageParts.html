@@ -4,12 +4,11 @@
 	<h5>{{msgInfo.documentation}}</h5>
 	
 	<data-accordion >
-			<data-message-form ng-repeat="part in msgInfo.parts" data-info='part.form'>{{part.name}}</data-message-form>	
+		<data-message-form ng-repeat="part in msgInfo.parts" data-info='part.form' data-part='part.name'></data-message-form>	
 	</data-accordion>
 
-	<!--<pre>respForm = {{respForm | json}}</pre>-->
 	<div class="btn-group " role="group" >
 		<input class="btn btn-sm btn-primary bordered" ng-click='backToOperations()' value="Back to operations" />
-		<input class="btn btn-sm btn-primary bordered" type="submit" value="Send {{msgInfo.operation}} request" ng-disabled="!isValideMsg"/>
+		<input class="btn btn-sm btn-primary bordered"  ng-click="msgRequest()" value="Send {{msgInfo.operation}} request" ng-disabled="!isValideMsg()"/>
 	</div>
 </div>

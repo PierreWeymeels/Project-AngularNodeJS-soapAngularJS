@@ -7,15 +7,18 @@ function($log,$compile) {
 		terminal : false,
 		scope : {
 			formInfo : "=info",
+			part: "=part",
 		},
 		templateUrl : "app/webService/templates/messageForm.html",
 		replace : true,
 		transclude : false,
 		compile : function compile(element, attrs) {
-			//$log.debug("messageForm compile");
+			$log.debug("messageForm compile");
 			return {
 				pre : function preLink(scope, element, attrs) {
 					//$log.debug("messageForm preLink",scope.formInfo);
+					scope.isSubForm = (scope.part === null);
+					scope.respForm = angular.copy(scope.formInfo.defaultImputsResp);
 				},
 				post : function postLink(scope, element, attrs, accordionController) {
 					//$log.debug("messageForm postLink", scope.formInfo);
@@ -25,9 +28,9 @@ function($log,$compile) {
 					//regardless if formInfo has forms or not :
 					//DO THIS =>
 					if (scope.formInfo.forms.length !== 0) {
-						$compile('<data-accordion ><data-message-form ng-repeat="form in formInfo.forms" data-info="form"></data-message-form></data-accordion>')(scope, function(cloned, scope) {
-							var nodeF = angular.element(element).find('form');
-						    nodeF.prepend(cloned);
+						$compile('<data-accordion ><data-message-form ng-repeat="form in formInfo.forms" data-info="form" data-part=null></data-message-form></data-accordion>')(scope, function(cloned, scope) {
+							var nodeF = angular.element(element).find('#buttonGroup');//.find('form');
+						    nodeF.before(cloned);//append prepend before after
 						});
 					};
 
@@ -46,15 +49,15 @@ function($log,$compile) {
 						//scope.formInfo.defaultResp = scope.respForm;
 					}
 					
-					//scope.respForm = angular.copy(scope.formInfo.defaultResp);
+					
 				}
 			}
 		},
 		controller : ['$scope',
 		function(scope, $scope, $parent) {
 			//$log.debug("operationForm controller",scope.formInfo);
-			var vm = this;
-			vm.respForm = angular.copy(scope.formInfo.defaultImputsResp);
+			var vm = this; 
+			
 		}],
 
 	}

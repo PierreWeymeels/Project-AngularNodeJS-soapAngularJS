@@ -2,8 +2,6 @@ angular.module('accordion_m', []).directive("accordion", ['$log',
 function($log) {
 	return {
 		restrict : "E",
-		//priority : 0,
-		//terminal : false,
 		scope: {},
 		template: "<div class='accordion' ng-transclude></div>",
 		replace: true,

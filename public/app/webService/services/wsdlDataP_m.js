@@ -177,15 +177,19 @@ function(soapWsdlProvider) {
 				}
 				throw {'message':'complexTypeNode: ' + nameValue + ' = null'};
 			} catch(e) {
-	    		throw appMessage.allocateError(e, MODULE_TAG, 'getComplexTypeAndSchemaNode', false);
+	    		throw appMessage.allocateError(e, MODULE_TAG, 'getComplexTypeNode', false);
 		    }	
 		}
 		
 		//TODO with xmlns analysis !!!
 		function getRestrictionValue(restrictionNode){
-			var base = getNodeAttributeValue(attributesNode, 'base');
-			var restriction = getName(base, ':');//, null);
-			return restriction;
+			try{
+				var base = getNodeAttributeValue(restrictionNode, 'base');
+				var restriction = getName(base, ':');//, null);
+				return restriction;
+			} catch(e) {
+	    		throw appMessage.allocateError(e, MODULE_TAG, 'getRestrictionValue', false);
+		    }
 						
 		}
 		
@@ -197,30 +201,34 @@ function(soapWsdlProvider) {
 		function getTypeOfAttributeNode(attributesNode,restrictionValue){
 			try{
 				if(restrictionValue.localeCompare('Array') ===0)
-				  var suffixe = '[]';
+				  var suffix = '[]';
 				else
 				  throw  {'message':'Unsupported restrictionValue !'}; 
 				var ref = getNodeAttributeValue(attributesNode, 'ref');
-				var name = 'wsdl:'+ref.getSuffix(':');
+				var name = 'wsdl:'+ getSuffix(ref,':');
 				var wsdlType = getNodeAttributeValue(attributesNode, name);
-				return {'type': isSimpleType(wsdlType), 'isSimple': getName(wsdlType, ':', suffixe)} ;
+				return {'isSimple': isSimpleType(wsdlType), 'type': getName(wsdlType, ':', suffix)} ;
 			} catch(e) {
 	    		throw appMessage.allocateError(e, MODULE_TAG, 'getTypeOfAttributeNode', false);
 		    }	
 		}
 		
 		function getNodeAttributeValue(node, name) {
-			var attribute = node.getAttributeNode(name);
-			return attribute.value;
+			try{
+				var attribute = node.getAttributeNode(name);
+				return attribute.value;
+			} catch(e) {
+	    		throw appMessage.allocateError(e, MODULE_TAG, 'getNodeAttributeValue', false);
+		    }	
 		}
 		
-		function getPrefix(prefixSeparator){
-			var result =  this.split(prefixSeparator);
+		function getPrefix(name, prefixSeparator){
+			var result =  name.split(prefixSeparator);
 			return result[0];
 		}
 		
-		function getSuffix(prefixSeparator){
-			var result =  this.split(prefixSeparator);
+		function getSuffix(name, prefixSeparator){
+			var result =  name.split(prefixSeparator);
 			return result[result.length-1];
 		}
 		//END OF PRIVATE METHODS-------------------------------------------------------------
@@ -331,12 +339,12 @@ function(soapWsdlProvider) {
 		 */
 		function getRestrictAndTypeOfAttribute(complexTypeName){
 			try {
-				var complexTypeNode = getComplexTypeAndSchemaNode(complexTypeName);
+				var complexTypeNode = getComplexTypeNode(complexTypeName);
 				var restrictionsNode = complexTypeNode.getElementsByTagName("restriction");
-				var attributesNode = restrictionNode.getElementsByTagName("attribute");
-				if((restrictionsNode.length === 1) && (attributesNode.length === 1)){
-					var restriction = getRestrictionValue(restrictionsNode);
-					var typeOfAttrib = getTypeOfAttributeNode(attributesNode);
+				var attributesNode = restrictionsNode[0].getElementsByTagName("attribute");
+				if(attributesNode.length === 1){
+					var restriction = getRestrictionValue(restrictionsNode[0]);
+					var typeOfAttrib = getTypeOfAttributeNode(attributesNode[0],restriction);
 					return {'restrictValue': restriction, 'type': typeOfAttrib.type, 'isSimple': typeOfAttrib.isSimple};
 				}else
 					throw {'message': 'Unsupported No or more than one restriction-node/attribute-node !!!'};

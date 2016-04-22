@@ -86,7 +86,7 @@ function(appMessage, $log, wsdlDataP) {
 					form.restrictSeq.push(result.restrictValue);
 					if(result.isSimple){ // SIMPLE TYPE =>
 						form.name = getAttributeValue('name', wsdlComTypTree._root.data.attributes);
-						form.imputs.push(getImputInfo(result.type,result.type));
+						form.imputs.push(getImputInfo(null, result.type, result.type));
 					}else{ // COMPLEX TYPE =>
 						wsdlComTypTree = wsdlDataP.getComplexTypeTreeInfo(result.type);//, null);
 						//recall:
