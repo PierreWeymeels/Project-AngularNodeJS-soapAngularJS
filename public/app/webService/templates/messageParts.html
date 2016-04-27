@@ -1,14 +1,19 @@
 <div class= well>
-	<h3>Operation: {{msgInfo.operation}}</h4>
-	<h4>Message: {{msgInfo.message}}</h5>
-	<h5>{{msgInfo.documentation}}</h5>
-	
-	<data-accordion >
-		<data-message-form ng-repeat="part in msgInfo.parts" data-info='part.form' data-part='part.name'></data-message-form>	
-	</data-accordion>
+  <h3>Operation: {{msgInfo.operation}}</h3>
+  <h4>Message: {{msgInfo.message}}</h4>
+  <h5>{{msgInfo.documentation}}</h5>
+  <pre>userSubmit = {{userSubmit| json}}</pre>   
+  <data-accordion>
+    <data-message-form ng-repeat="part in msgInfo.parts" data-info='part.form' 
+      data-part='part.name' ng-model="userSubmit.parts[$index]">             
+    </data-message-form>	
+  </data-accordion>
 
-	<div class="btn-group " role="group" >
-		<input class="btn btn-sm btn-primary bordered" ng-click='backToOperations()' value="Back to operations" />
-		<input class="btn btn-sm btn-primary bordered"  ng-click="msgRequest()" value="Send {{msgInfo.operation}} request" ng-disabled="!isValideMsg()"/>
-	</div>
+  <div class="btn-group " role="group" >
+    <input class="btn btn-sm btn-primary bordered" ng-click='backToOperations()' value="Back to operations" />
+    <input class="btn btn-sm btn-primary bordered"  ng-click="msgRequest()" value="Send {{msgInfo.operation}} request" />
+  </div>
+  <div ng-if="alertMsg.show" class="alert alert-danger fade in">
+    {{alertMsg.message}}
+  </div>
 </div>

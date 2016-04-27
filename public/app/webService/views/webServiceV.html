@@ -1,31 +1,32 @@
 <div class="jumbotron text-center">
-	<div class="well well-sm">
-		<h1>WEB SERVICE BINDING</h1>
-		<div class="row">
-			<!--12 col-->
-			<div class="img-thumbnail col-md-1 col-md-offset-4"><img class="img-responsive" src="assets/img/logo_IMCCE-VOParis_tiers.png" alt="logo-voParis">
-			</div>
-			<div class="img-thumbnail col-md-1"><img class="img-responsive" src="assets/img/logo_IMCCE-t.png" alt="logo-IMCCE">
-			</div>
-			<div class="img-thumbnail col-md-2"><img class="img-responsive" src="assets/img/cdaweb3.jpg" alt="logo-cdas">
-			</div>
-		</div>
-	</div>
-	
-	<div ng-if="!wsC.initialized" class="btn-group animate-if" >
-		<input type="file" value="" data-file-dialog />
-	</div>
-	
-	<div ng-if="wsC.errorMsg" class="alert alert-danger fade in">
-		<a href="#" ng-click='wsC.ErrorDivClosing()' class="close" data-dismiss="alert" aria-label="close">&times</a>
-		<strong>Error !</strong>  {{wsC.errorMsg}}
-	</div>
-	
-	<h3 ng-if="wsC.initialized">Link to {{wsC.fileName}} WSDL</h3>
-	
-	<data-operations-table ng-if= 'wsC.tableVisibility' data-info= 'wsC.webServiceInfo' data-back='wsC.tableAction("back")'>
-	</data-operations-table>
-	
-	<data-message-parts ng-if="wsC.msgVisibility" data-info='wsC.msgRequestInfo' data-submit='wsC.msgAction("submit")' data-back='wsC.msgAction("back")'>
-	</data-message-parts>
+  <div class="well well-sm">
+    <h1>WEB SERVICE BINDING</h1>
+    <div class="row">
+      <!--12 col-->
+      <div class="img-thumbnail col-md-1 col-md-offset-4"><img class="img-responsive" src="assets/img/logo_IMCCE-VOParis_tiers.png" alt="logo-voParis">
+      </div>
+      <div class="img-thumbnail col-md-1"><img class="img-responsive" src="assets/img/logo_IMCCE-t.png" alt="logo-IMCCE">
+      </div>
+      <div class="img-thumbnail col-md-2"><img class="img-responsive" src="assets/img/cdaweb3.jpg" alt="logo-cdas">
+      </div>
+    </div>
+  </div>
+
+  <div ng-if="!wsC.initialized" class="btn-group animate-if" >
+    <input type="file" value="" data-file-dialog />
+  </div>
+
+  <div ng-if="wsC.errorMsg" class="alert alert-danger fade in">
+    <a href="#" ng-click='wsC.ErrorDivClosing()' class="close" data-dismiss="alert" aria-label="close">&times</a>
+    <strong>Error !</strong>  {{wsC.errorMsg}}
+  </div>
+
+  <h3 ng-if="wsC.initialized">Link to {{wsC.fileName}} WSDL</h3>
+
+  <data-operations-table ng-if='wsC.tableVisibility' data-info= 'wsC.webServiceInfo' data-back='wsC.tableAction("back")'>
+  </data-operations-table>
+
+  <data-message-parts ng-if="wsC.msgVisibility" data-info='wsC.msgRequestInfo' ng-model="wsC.msgUserSubmit"
+                      data-submit='wsC.msgAction("submit")' data-back='wsC.msgAction("back")'>
+  </data-message-parts>
 </div>

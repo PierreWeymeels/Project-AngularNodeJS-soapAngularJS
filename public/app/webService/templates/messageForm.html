@@ -1,33 +1,36 @@
 <div class='fAccordion well well-sm'><!-- well -->
-	<h5 class="text-danger " aria-label="Type: bold" ng-if="!isSubForm" >Part: {{part}}</h5>
-	<a href ng-click='toggle()'><h5 class="bg-info text-info bordered">{{formInfo.name}} form</h5></a>
-	<h6 class="text-info ">{{formInfo.documentation}}</h6>
-	
-	<form ng-show='visible' role="form" class=" animate-if" name="myForm" ng-submit='formSubmit()' novalidate>
-		<div class="well-sm row"><div class="well-sm" ng-repeat="restriction in formInfo.restrictSeq">{{restriction}}</div></div>
-		<div class="form-inline ">
-			<div class="form-group well-sm" ng-repeat="inputI in formInfo.imputs">
-				<label class="control-label text-primary " for="input_{{inputI.name}}" >{{inputI.name}}:</label>
+  <h5 class="text-danger " aria-label="Type: bold" ng-if="!isSubForm" >Part: {{part}}</h5>
+  <a href ng-click='toggle()'><h5 class="bg-info text-info bordered">{{formInfo.name}} form</h5></a>
+  <h6 class="text-info ">{{formInfo.documentation}}</h6>
 
-				<div ng-class="{'has-error': myForm[inputI.name].$invalid, 'has-success': !myForm[inputI.name].$invalid}">
-					<input class="form-control" id="input_{{inputI.name}}"
-					aria-describedby="helpBlock_{{inputI.name}}" name="{{inputI.name}}" type="{{inputI.type}}" step="{{inputI.step}}"
-					ng-model='respForm[inputI.name]' ng-required="{{inputI.required}}" >
-					<!-- value="{{inputI.value}}" ng-pattern="input.format"  step="{{inputI.step}}" -->
-					</input>
+  <form ng-show='visible' role="form" class=" animate-if" name="myForm" ng-submit='formSubmit()' novalidate>
+    <div class="well-sm row"><div class="well-sm" ng-repeat="restriction in formInfo.restrictSeq">{{restriction}}</div></div>
+    <div class="form-inline ">
+      <div class="form-group well-sm" ng-repeat="inputI in formInfo.imputs">
+        <label class="control-label text-primary " for="input_{{inputI.name}}" >{{inputI.name}}:</label>
 
-					<div ng-if='myForm[inputI.name].$invalid' role="alert" ng-messages= 'myForm[inputI.name].$error'>
-						<div ng-messages-include="app/webService/templates/erreurs.html"></div>
-					</div>
-				</div>
+        <div ng-class="{'has-error': myForm[inputI.name].$invalid, 'has-success': !myForm[inputI.name].$invalid}">
+          <input class="form-control" id="input_{{inputI.name}}"
+                 aria-describedby="helpBlock_{{inputI.name}}" name="{{inputI.name}}" type="{{inputI.type}}" step="{{inputI.step}}"
+                 ng-model='respForm[inputI.name]' ng-required="{{inputI.required}}" >
+          <!-- value="{{inputI.value}}" ng-pattern="input.format"  step="{{inputI.step}}" -->
+          </input>
 
-				<!--<span class="help-block text-info" id="helpBlock_{{inputI.name}}" >{{inputI.description}}</span>-->
-			</div>
-		</div>
-		<!--<pre>respForm = {{respForm | json}}</pre>-->   
-		<div id="buttonGroup" class="btn-group well-sm" role="group" >
-			<input type='button' class="bg-info bordered"  value="reset" ng-click="reset()" />
-			<input type='submit' class="bg-info bordered"  value="submit" ng-disabled="myForm.$invalid"/>
-		</div>
-	</form>
+          <div ng-if='myForm[inputI.name].$invalid' ng-init='userSubmit.readyToSend = false' role="alert" ng-messages= 'myForm[inputI.name].$error'>
+            <div ng-messages-include="app/webService/templates/erreurs.html"></div>
+          </div>
+        </div>
+
+        <!--<span class="help-block text-info" id="helpBlock_{{inputI.name}}" >{{inputI.description}}</span>-->
+      </div>
+    </div>
+    <!--<pre>respForm = {{respForm | json}}</pre>-->   
+    <div id="buttonGroup" class="btn-group well-sm" role="group" >
+      <input type='button' class="bg-info bordered"  value="reset" ng-click="reset()" />
+      <input type='submit' id='submitB' class="bg-info bordered"  value="submit" ng-disabled="myForm.$invalid"/>
+    </div>
+    <div ng-if="alertMsg.show" class="alert alert-danger fade in">
+      {{alertMsg.message}}
+    </div>
+  </form>
 </div>

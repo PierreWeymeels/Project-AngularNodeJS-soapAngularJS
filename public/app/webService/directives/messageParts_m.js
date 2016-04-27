@@ -1,7 +1,8 @@
-angular.module('messageParts_m', []).directive("messageParts", ['$log',
-function($log) {
+angular.module('messageParts_m', []).directive("messageParts", ['$log', '$timeout',
+function($log, $timeout) {
 	return {
 		restrict : "E",
+    require : 'ng-model',
 		priority : 0,
 		terminal : false,
 		scope : {
@@ -18,30 +19,32 @@ function($log) {
 				pre : function preLink(scope, element, attrs) {
 					//$log.debug("messageParts preLink",scope.msgInfo);
 				},
-				post : function postLink(scope, element, attrs) {
+				post : function postLink(scope, element, attrs, ngModelC) {
 					//$log.debug("messageParts postLink",scope.msgInfo);
-
-					scope.isValideMsg = function() {
-						return ((scope.msgInfo.parts.length === 0) || isFormsValid());
-					};
+          
+          function readyToSend() {
+            var result = false;
+            var parts = scope.userSubmit.parts;
+            for (var i = 0; i < parts.length; ++i) {
+              if(parts[i].readyToSend === false)
+                return false;
+            }
+            return true;
+          }
 
 					scope.msgRequest = function() {
-						scope.$emit('msgRequest', {'operation':msgInfo.operation,'message': msgInfo.message,
-							'partsSubmit': partsSubmit()});
+             if (readyToSend()){
+                ngModelC.$setViewValue(scope.userSubmit);
+                scope.msgSubmit();
+              }else{
+                scope.alertMsg = {'show': true, 'message': 'Miss (sub)form(s) submit !'};
+                var t ="t";
+                $timeout(function() {
+                  scope.alertMsg = {'show': false, 'message': null};
+                },1000);       
+              }
 					};
 					
-					
-					function isFormsValid(){
-						//TODO
-						return true;
-					}
-					
-					function partsSubmit(){//e.g : getAvailabilityRequest
-						var result = [];
-						result.push({'formName': 'simple', 'imputsResp':{'mime':'votable'}})
-						//TODO
-						return result;
-					}
 				}
 			}
 		},
@@ -49,8 +52,14 @@ function($log) {
 		function(scope, $scope, $parent) {
 			//$log.debug("messageParts controller",scope.msgInfo);
 			var vm = this;
-
+      
+      initialize();
+      
+      function initialize(){
+        scope.alertMsg = {'show': false, 'message': null};
+        scope.userSubmit = {'operation': scope.msgInfo.operation, 'message': scope.msgInfo.message,
+        'parts': []};   
+      }
 		}],
-
 	}
 }]);
