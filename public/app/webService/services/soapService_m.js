@@ -39,6 +39,21 @@ function($log, appMessage, directivesDataP, soapRequest, wsdlDataP, soapMessage)
 			};
 		}
 	}
+  
+  function getServerAnswer(msgUserSubmit){
+    try {
+			var soapMsg = soapMessage.getSoapMsg(msgUserSubmit);
+			return {
+				'error' : false,
+				'data' : soapRequest.getServerAnswer(soapMsg)
+			};
+		} catch(e) {
+			return {
+				'error' : true,
+				'data' : appMessage.allocateError(e, MODULE_TAG, 'getServerAnswer', true)
+			};
+		}
+  }
 	//END OF PUBLIC METHODS-----------------------------------------------------------
 
 	//INTERFACE-----------------------------------------------------------------------
@@ -51,7 +66,10 @@ function($log, appMessage, directivesDataP, soapRequest, wsdlDataP, soapMessage)
 		},
 		getMsgRequestInfo : function(operationName) {
 			return getMsgRequestInfo(operationName);
-		}
+		},
+    getServerAnswer: function(msgUserSubmit){
+      return getServerAnswer(msgUserSubmit);
+    },
 	};
 
 }]);

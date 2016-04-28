@@ -252,6 +252,15 @@ angular.module('wsdlDataP_m', [])
            that.name = name;
            that.value = value;
          }
+         
+         function BindingInfo(){
+           var that = this;
+           that.tns = null;
+           that.binding = {'style': null, 'transport': null};
+           that.operation = {'soapAction': null, 'style': null,};
+           that.header = {'use': null, 'part': null, };// || null
+           that.body = {};
+         }
          //END CLASSES ------------------------------------------------------------------------
 
          //PUBLIC METHODS------------------------------------------------------------------
@@ -353,11 +362,22 @@ angular.module('wsdlDataP_m', [])
            }
          }
          //END OF USED BY directivesDataP---------------
+         
+         //USED BY soapMessage--------------------------
+         function getBindingInfo(operation){
+           try{
+             var result = new BindingInfo();
+             
+             return result;
+           } catch (e) {
+             throw appMessage.allocateError(e, MODULE_TAG, 'getBindingInfo', false);
+           }
+         }
          //END OF PUBLIC METHODS------------------------------------------------------------------
 
          //INTERFACE-----------------------------------------------------------------------
          return {
-           //USED BY soapService:---------------
+           //USED BY soapService:-------------------------------------
            initializeWsdl: function (newWsdl) {
              return initializeWsdl(newWsdl);
            },
@@ -367,7 +387,7 @@ angular.module('wsdlDataP_m', [])
            getMessageTreeInfo: function (operationName, childNodeTag) {
              return getMessageTreeInfo(operationName, childNodeTag);
            },
-           //USED BY directivesDataP:---------------
+           //USED BY directivesDataP:---------------------------------
            isSimpleType: function (wsdlType) {
              return isSimpleType(wsdlType);
            },
@@ -376,8 +396,11 @@ angular.module('wsdlDataP_m', [])
            },
            getRestrictAndTypeOfAttribute: function (complexTypeName) {
              return getRestrictAndTypeOfAttribute(complexTypeName);
+           },
+           //USED BY soapMessage:-------------------------------------
+           getBindingInfo: function(operation){
+             return getBindingInfo(operation);
            }
-
          };
 
        }];

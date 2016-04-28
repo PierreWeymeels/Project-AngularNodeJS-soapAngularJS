@@ -9,7 +9,8 @@ angular.module('webServiceC_m', ['soapService_m'])
 
        vm.initialized = false;
        vm.tableVisibility = false;
-       vm.msgVisibility = false;
+       vm.msgVisibility = false
+       vm.answerVisibility = false;
 
        vm.fileName = null;
 
@@ -63,7 +64,7 @@ angular.module('webServiceC_m', ['soapService_m'])
        vm.msgAction = function (action) {
          switch (action) {
            case 'submit':
-             //msgSubmit();
+             msgSubmit();
              break;
            case 'reset':
              //
@@ -97,6 +98,16 @@ angular.module('webServiceC_m', ['soapService_m'])
          } else
            vm.errorMsg = result.data;
          launchDigest(outsideAng);
+       }
+       
+       function msgSubmit(){
+         var result = soapService.getServerAnswer(vm.msgUserSubmit);
+         if (!result.error) {
+           //TODO
+           vm.answerVisibility = true;
+         }else
+           vm.errorMsg = result.data;   
+         vm.msgUserSubmit = null;
        }
 
        function launchDigest(outsideAng) {
