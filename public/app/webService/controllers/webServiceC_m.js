@@ -1,8 +1,8 @@
 "use strict";
 
 angular.module('webServiceC_m', ['soapService_m'])
-   .controller('webServiceC', ['soapService', '$log', '$scope',
-     function (soapService, $log, $scope) {
+   .controller('webServiceC', ['soapService', '$log', '$scope', '$document',
+     function (soapService, $log, $scope, $document) {
        var vm = this;
        //VIEW-MODEL VARIABLES:-------------------------------------------------
        vm.errorMsg = false;
@@ -64,7 +64,7 @@ angular.module('webServiceC_m', ['soapService_m'])
        vm.msgAction = function (action) {
          switch (action) {
            case 'submit':
-             msgSubmit();
+             soapService.sentMsgToServer(vm.msgUserSubmit);
              break;
            case 'reset':
              //
@@ -99,21 +99,30 @@ angular.module('webServiceC_m', ['soapService_m'])
            vm.errorMsg = result.data;
          launchDigest(outsideAng);
        }
-       
-       function msgSubmit(){
-         var result = soapService.getServerAnswer(vm.msgUserSubmit);
-         if (!result.error) {
-           //TODO
-           vm.answerVisibility = true;
-         }else
-           vm.errorMsg = result.data;   
-         vm.msgUserSubmit = null;
-       }
 
        function launchDigest(outsideAng) {
          if (outsideAng)
            $scope.$digest();
        }
+       
+       function serverResp(result){
+         if (!result.error) {    
+           var target = $document[0].getElementsByTagName('div')[10];//.getElementById('serverRsp');
+           target.innerHTML = result.data;
+           //TODO push this into messageServer directive !
+         }else
+           vm.errorMsg = result.data;   
+         vm.msgUserSubmit = null;
+       }
        //END OF PRIVATES METHODS:-------------------------------------------------
+       
+       //OBSERVER PATTERN =>
+       soapService.addObserverCB(serverResp);
+       //END OF PATTERN
+
+       //FOR TEST =>
+       vm.test = function(){
+         soapService.sentMsgToServer(vm.msgUserSubmit);
+       }
 
      }]);
