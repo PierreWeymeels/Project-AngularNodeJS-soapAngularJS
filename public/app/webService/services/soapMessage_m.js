@@ -61,6 +61,7 @@ angular.module('soapMessage_m', [])
        }
        //END OF PRIVATE METHODS =>----------------------------------------------------------
 
+
        //PUBLIC METHODS =>------------------------------------------------------------------
        function getSoapMsg(msgUserSubmit) {
          try {
