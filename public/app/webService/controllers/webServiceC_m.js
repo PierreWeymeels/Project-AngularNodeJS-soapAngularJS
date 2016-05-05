@@ -64,7 +64,7 @@ angular.module('webServiceC_m', ['soapService_m'])
        vm.msgAction = function (action) {
          switch (action) {
            case 'submit':
-             soapService.sentMsgToServer(vm.msgUserSubmit);
+             soapService.sentMsgToServer(vm.msgRequestInfo, vm.msgUserSubmit);
              break;
            case 'reset':
              //
@@ -110,9 +110,11 @@ angular.module('webServiceC_m', ['soapService_m'])
            var target = $document[0].getElementsByTagName('div')[10];//.getElementById('serverRsp');
            target.innerHTML = result.data;
            //TODO push this into messageServer directive !
+           vm.msgVisibility = false;
          }else
            vm.errorMsg = result.data;   
          vm.msgUserSubmit = null;
+         //launchDigest(true);
        }
        //END OF PRIVATES METHODS:-------------------------------------------------
        
@@ -122,7 +124,7 @@ angular.module('webServiceC_m', ['soapService_m'])
 
        //FOR TEST =>
        vm.test = function(){
-         soapService.sentMsgToServer(vm.msgUserSubmit);
+         soapService.sentMsgToServer(vm.msgRequestInfo, vm.msgUserSubmit);
        }
 
      }]);

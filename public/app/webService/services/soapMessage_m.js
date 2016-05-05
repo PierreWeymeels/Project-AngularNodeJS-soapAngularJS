@@ -7,7 +7,7 @@ angular.module('soapMessage_m', [])
         * http://www.w3schools.com/xml/xml_soap.asp
         */
        //TODO
-       
+
        //PRIVATE VARIABLES----------------------------------------------------------
        var MODULE_TAG = 'soapMessage_m';
 
@@ -21,14 +21,14 @@ angular.module('soapMessage_m', [])
        function getSoapHeader(hInfo) {
          var part = "clientID";
          /*if(hInfo === null)
-           return '';*/
+          return '';*/
          var result =
             '<SOAP-ENV:Header>'
-            + '<'+part+'>'
+            + '<' + part + '>'
             + '<from>angularClient</from>'
             + '<hostip>127.0.0.1/</hostip>'
             + '<lang>en</lang>'
-            + '</'+part+'>'
+            + '</' + part + '>'
             + '</SOAP-ENV:Header>';
          return result;
        }
@@ -39,40 +39,61 @@ angular.module('soapMessage_m', [])
         * @param {type} partsInfo
         * @returns {soap rpc encoded body}
         */
-       function getSoapBody(bInfo,partsInfo) {
-         var operation = "getAvailability";
-         var part= "mime";
-         var type= "xsd:string";
-         var mime = "html";//votable html text/cvs
-         var result =
-            '<SOAP-ENV:Body ' 
-            + 'namespace="http://vo.imcce.fr/webservices/miriade" '
-            + 'encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" >' 
-            + '<'+operation+'>'
-            + '<'+part+' type='+type+' >'+mime+'</'+part+'>'
-            + '</'+operation+'>'
-            + '</SOAP-ENV:Body>'
-         return result;
+       function getSoapBody(msgPartsData, msgUserSubmit) {
+         $log.debug('msgPartsData', msgPartsData);
+         $log.debug('msgUserSubmit', msgUserSubmit);
+         try {
+           var soapParts = '';
+           var msgParts = msgPartsData.parts;
+           var userRspParts = msgUserSubmit.parts;
+           for (var i = 0; i < msgParts.length; ++i) {
+             var soapPart = '<' + msgParts[i].name + ' type=\"tns:' + msgParts[i].form.name + '\" >';
+             //TODO check if not simple form , below only for not simple form:
+             soapPart += '<' + msgParts[i].form.name + '>';//instead of  '<xsd:complexType name="ephemccRequest">'+ '<xsd:all>'
+             var imputs = msgParts[i].form.imputs;//[]
+             var userRsp = userRspParts[i].imputs;//{}
+             var soapElements = '';
+             for (var j = 0; j < imputs.length; ++j) {
+               soapElements += '<' + imputs[j].name + ' type=\"xsd:' + imputs[j].xsdType + '\" >' + userRsp[imputs[j].name] + '</' + imputs[j].name + '>';
+             }
+             soapPart += soapElements;
+             soapPart += '</' + msgParts[i].form.name + '>'
+             soapPart += '</' + msgParts[i].name + '>';
+             soapParts += soapPart;
+           }
+
+           var result =
+              '<SOAP-ENV:Body '
+              + 'namespace="http://vo.imcce.fr/webservices/miriade" '
+              + 'encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" >'
+              + '<' + msgPartsData.operation + '>'
+              + soapParts
+              + '</' + msgPartsData.operation + '>'
+              + '</SOAP-ENV:Body>'
+           return result;
+         } catch (e) {
+           throw appMessage.allocateError(e, MODULE_TAG, 'getSoapBody', false);
+         }
        }
-       
-       
-       function getSoapChildrenElement(){
-         
+
+
+       function getSoapChildrenElement() {
+
        }
        //END OF PRIVATE METHODS =>----------------------------------------------------------
 
 
        //PUBLIC METHODS =>------------------------------------------------------------------
-       function getSoapMsg(msgUserSubmit) {
+       function getSoapMsg(msgPartsData, msgUserSubmit) {
          try {
            //var bindingInfo = wsdlDataP.getBindingInfo(operation);    
            var xmlHeader = '<?xml version="1.0" encoding="UTF-8"?>';
            var soapHeader = getSoapHeader(null);//bindingInfo.header);
-           var soapBody = getSoapBody(null);//bindingInfo.body, msgUserSubmit.parts);
+           var soapBody = getSoapBody(msgPartsData, msgUserSubmit);//bindingInfo.body, msgUserSubmit.parts);
            //xmlns def node +header + body :
-           var soapEnvelope = '<SOAP-ENV:Envelope ' 
-              + 'xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" ' 
-              + 'xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" ' 
+           var soapEnvelope = '<SOAP-ENV:Envelope '
+              + 'xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" '
+              + 'xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" '
               + 'xmlns:xsd="http://www.w3.org/2001/XMLSchema" '
               + 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
               + 'xmlns:tns="http://vo.imcce.fr/webservices/miriade" '
@@ -80,10 +101,10 @@ angular.module('soapMessage_m', [])
               + 'xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" '
               + 'xmlns="http://schemas.xmlsoap.org/wsdl/" '
               + 'targetNamespace="http://vo.imcce.fr/webservices/miriade" >'
-              + soapHeader 
+              + soapHeader
               + soapBody
               + '</SOAP-ENV:Envelope>';
-    
+
            return xmlHeader + soapEnvelope;
          } catch (e) {
            throw appMessage.allocateError(e, MODULE_TAG, 'getSoapMsg', false);
@@ -94,9 +115,24 @@ angular.module('soapMessage_m', [])
 
        //INTERFACE =>-----------------------------------------------------------------------
        return {
-         getSoapMsg: function (msgUserSubmit) {
-           return getSoapMsg(msgUserSubmit);
+         getSoapMsg: function (msgPartsData, msgUserSubmit) {
+           return getSoapMsg(msgPartsData, msgUserSubmit);
          },
        }
 
      }]);
+/*function getSoapBody(bInfo,partsInfo) {
+ var operation = "getAvailability";
+ var part= "mime";
+ var type= "xsd:string";
+ var mime = "html";//votable html text/cvs
+ var result =
+ '<SOAP-ENV:Body ' 
+ + 'namespace="http://vo.imcce.fr/webservices/miriade" '
+ + 'encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" >' 
+ + '<'+operation+'>'
+ + '<'+part+' type='+type+' >'+mime+'</'+part+'>'
+ + '</'+operation+'>'
+ + '</SOAP-ENV:Body>'
+ return result;
+ }*/

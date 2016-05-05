@@ -177,8 +177,9 @@ function(appMessage, $log, wsdlDataP) {
 				return result;
 			}else{	
 				var hasDefault = false;	
-				var wsdlType = getAttributeValue('type', attributes);			
-				setHtmlType(getXmlType(wsdlType),result);	
+				var wsdlType = getAttributeValue('type', attributes);
+        result.xsdType = getXmlType(wsdlType);
+				setHtmlType(result.xsdType,result);	
 				for (var i = 0; i < attributes.length; ++i) {	
 					var name = attributes[i].name;
 					switch(name) {
@@ -289,7 +290,7 @@ function(appMessage, $log, wsdlDataP) {
 	
 	function FormInfo(){
 		var that = this;
-		that.name = name;
+		that.name;// = name; >>ATTENTION MODIF NON VERIFIEE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		that.restrictSeq= [];
 		that.documentation = 'undocumented';
 		that.forms = [];
@@ -300,6 +301,7 @@ function(appMessage, $log, wsdlDataP) {
 	function ImputInfo(){
 		var that = this;
 		that.name = '';
+    that.xsdType = '';
 		that.type = '';
 		that.step = '';
 		that.required = false;

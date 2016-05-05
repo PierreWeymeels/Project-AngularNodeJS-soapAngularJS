@@ -54,17 +54,10 @@ angular.module('soapRequest_m', [])
 
          function getServerAnswer(soapMsg) {
            try {
-             var soapAction = 'http://vo.imcce.fr/webservices/miriade/getAvailability';
+             var soapAction = 'http://vo.imcce.fr/webservices/miriade/ephemcc';//getAvailability';
              var xsl = $http(requestConfig(true, 'get', miriadeXsl, null));
-             var xml = $http(requestConfig(false, 'POST', soapAction, soapMsg));
-             //$q.all([xsl, xml]).then(function(results) { 
-               //var xsltProcessor = new XSLTProcessor();
-               //xsltProcessor.importStylesheet(results[0].data);
-                
-           
-               //var resultDoc = xsltProcessor.transformToDocument(results[1].data);
-               //$log.debug('resultDoc:   ', resultDoc);
-               return $q.all([xsl, xml]);//results;//resultDoc;  
+             var xml = $http(requestConfig(false, 'POST', soapAction, soapMsg)); 
+             return $q.all([xsl, xml]);
            } catch (e) {
              throw appMessage.allocateError(e, MODULE_TAG, 'getServerAnswer', false);
            }
