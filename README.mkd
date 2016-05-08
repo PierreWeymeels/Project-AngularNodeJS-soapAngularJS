@@ -4,3 +4,4 @@
 
 <p>This project use WSDL file to auto-generate web service operations table and for each operation, their request forms</p>
 
+<p>(based on wsdl files provided by IMCCE Miriade and NASA Cdas web services) </p>
