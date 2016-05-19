@@ -27,15 +27,66 @@ angular.module('soapRequest_m', [])
          var uriwsdl = namespace.concat('/miriade.wsdl');
          var nasaWsdl = 'http://cdaweb.gsfc.nasa.gov/WS/jaxrpc?WSDL';
          var miriadeXsl = 'http://vo.imcce.fr/webservices/miriade/miriade.xsl';
+         
+         
+         
+         var soapMsgEphemc = 
+          '<?xml version="1.0" encoding="UTF-8"?>'
+          +'<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" '
+          +'xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" '
+          +'xmlns:xsd="http://www.w3.org/2001/XMLSchema" '
+          +'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
+          +'xmlns:tns="http://vo.imcce.fr/webservices/miriade" '
+          +'xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" ' 
+          +'xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" '
+          +'xmlns="http://schemas.xmlsoap.org/wsdl/" '
+          +'targetNamespace="http://vo.imcce.fr/webservices/miriade" >'
+          +'<SOAP-ENV:Header>'
+          +'<clientID>'
+          +'<from>angularClient</from>'
+          +'<hostip>127.0.0.1/</hostip>'
+          +'<lang>en</lang>'
+          +'</clientID>'
+          +'</SOAP-ENV:Header>'
+          +'<SOAP-ENV:Body namespace="http://vo.imcce.fr/webservices/miriade" '
+          +'encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" >'
+          //+'<ephemcc>'
+          //+'<input type="ephemccRequest" >'
+          +'<ephemccRequest>'
+          //+'<xsd:complexType name="ephemccRequest">'namespace
+          //+'<xsd:all>'
+          +'<name type="xsd:string" >p:Mars</name>'
+          +'<type type="xsd:string" >planet</type>'
+          +'<epoch type="xsd:string" >1977-04-22T01:00:00-05:00</epoch>'
+          +'<nbd type="xsd:int" >1</nbd>'
+          +'<step type="xsd:string" >1d</step>'
+          +'<tscale type="xsd:string" >UTC</tscale>'
+          +'<observer type="xsd:string" >500</observer>'
+          +'<theory type="xsd:string" >INPOP</theory>'
+          +'<teph type="xsd:int" >1</teph>'
+          +'<tcoor type="xsd:int" >1</tcoor>'
+          +'<rplane type="xsd:int" >1</rplane>'
+          +'<mime type="xsd:string" >votable</mime>'
+          +'<output type="xsd:string" ></output>'
+          +'<extrap type="xsd:int" >0</extrap>'
+          +'<get type="xsd:string" >orbital_params</get>'
+          //+'</xsd:all>'
+          //+'</xsd:complexType>'
+          +'</ephemccRequest>'
+          //+'</input>'
+          //+'</ephemcc>'
+          +'</SOAP-ENV:Body>'
+          +'</SOAP-ENV:Envelope>';
+        
 
-         function requestConfig(cache, method, url, soapMsg) {//cache: cache,
+         function requestConfig(cache, method, url, soapMsg, contentType) {//cache: cache,
            var rqtConfig = {
              cache: cache,
              method: method,
              url: url,
              data: soapMsg,
-             headers: {//'Accept' : "text/xml",  'Accept-Encoding' : 'chunked',
-               'Content-Type': "text/plain;charset=\"utf-8\"",
+             headers: {//'Accept' : "text/xml",  'Accept-Encoding' : 'chunked',plain application/xml
+               'Content-Type': contentType,
              },
              //params: {WSDL: ""},
              //responseType: "",
@@ -54,9 +105,10 @@ angular.module('soapRequest_m', [])
 
          function getServerAnswer(soapMsg) {
            try {
-             var soapAction = 'http://vo.imcce.fr/webservices/miriade/ephemcc';//getAvailability';
-             var xsl = $http(requestConfig(true, 'get', miriadeXsl, null));
-             var xml = $http(requestConfig(false, 'POST', soapAction, soapMsg)); 
+             $log.debug('SOAPMSGTEST : ',soapMsgEphemc);
+             var soapAction = 'http://vo.imcce.fr/webservices/miriade/ephemcc';//getAvailability ephemcc
+             var xsl = $http(requestConfig(true, 'get', miriadeXsl, null,"text/plain;charset=\"utf-8\""));
+             var xml = $http(requestConfig(false, 'post', soapAction, soapMsgEphemc,"text/plain;charset=\"utf-8\"")); 
              return $q.all([xsl, xml]);
            } catch (e) {
              throw appMessage.allocateError(e, MODULE_TAG, 'getServerAnswer', false);

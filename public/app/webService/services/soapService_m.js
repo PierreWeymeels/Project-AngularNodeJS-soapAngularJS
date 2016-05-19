@@ -46,8 +46,9 @@ angular.module('soapService_m', ['directivesDataP_m', 'soapRequest_m', 'wsdlData
 
        function sentMsgToServer(msgPartsData, msgUserSubmit) {
          try {
-           var soapMsg = soapMessage.getSoapMsg(msgPartsData, msgUserSubmit);
-           var rsp = soapRequest.getServerAnswer(soapMsg);
+           //var soapMsg = soapMessage.getSoapMsg(msgPartsData, msgUserSubmit);
+           //$log.debug('SOAPMSG : ',soapMsg);
+           var rsp = soapRequest.getServerAnswer(null);//soapMsg
            rsp.then(function (result) {
              notify({'error': false, 'data': getHtml(result[0].data,result[1].data)});
            }, function (e) {

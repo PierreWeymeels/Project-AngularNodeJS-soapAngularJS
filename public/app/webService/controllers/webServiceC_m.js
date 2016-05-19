@@ -124,7 +124,7 @@ angular.module('webServiceC_m', ['soapService_m'])
 
        //FOR TEST =>
        vm.test = function(){
-         soapService.sentMsgToServer(vm.msgRequestInfo, vm.msgUserSubmit);
+         soapService.sentMsgToServer(null,null); 
        }
 
      }]);

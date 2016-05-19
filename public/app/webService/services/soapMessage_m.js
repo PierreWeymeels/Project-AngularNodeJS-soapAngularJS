@@ -47,19 +47,27 @@ angular.module('soapMessage_m', [])
            var msgParts = msgPartsData.parts;
            var userRspParts = msgUserSubmit.parts;
            for (var i = 0; i < msgParts.length; ++i) {
+             
              var soapPart = '<' + msgParts[i].name + ' type=\"tns:' + msgParts[i].form.name + '\" >';
              //TODO check if not simple form , below only for not simple form:
              soapPart += '<' + msgParts[i].form.name + '>';//instead of  '<xsd:complexType name="ephemccRequest">'+ '<xsd:all>'
+             
              var imputs = msgParts[i].form.imputs;//[]
              var userRsp = userRspParts[i].imputs;//{}
              var soapElements = '';
+             
+             soapElements += '<xsd:all>';
              for (var j = 0; j < imputs.length; ++j) {
-               soapElements += '<' + imputs[j].name + ' type=\"xsd:' + imputs[j].xsdType + '\" >' + userRsp[imputs[j].name] + '</' + imputs[j].name + '>';
+               soapElements += '<' + imputs[j].name + ' xsi:type=\"xsd:' + imputs[j].xsdType + '\" >' + userRsp[imputs[j].name] + '</' + imputs[j].name + '>';
              }
+             soapElements += '</xsd:all>';
+             
              soapPart += soapElements;
              soapPart += '</' + msgParts[i].form.name + '>'
              soapPart += '</' + msgParts[i].name + '>';
              soapParts += soapPart;
+             
+             //soapParts += soapElements;
            }
 
            var result =
