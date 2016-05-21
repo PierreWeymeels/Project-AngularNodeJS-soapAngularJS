@@ -50,10 +50,10 @@ angular.module('soapRequest_m', [])
           +'</SOAP-ENV:Header>'
           +'<SOAP-ENV:Body namespace="http://vo.imcce.fr/webservices/miriade" '
           +'encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" >'
-          //+'<ephemcc>'
-          //+'<input type="ephemccRequest" >'
           +'<ephemccRequest>'
-          //+'<xsd:complexType name="ephemccRequest">'namespace
+          +'<part name="input" type="tns:ephemccRequest" >'
+          //+'<tns:ephemccRequest>'
+          //+'<xsd:complexType name="ephemccRequest">'
           //+'<xsd:all>'
           +'<name type="xsd:string" >p:Mars</name>'
           +'<type type="xsd:string" >planet</type>'
@@ -72,9 +72,9 @@ angular.module('soapRequest_m', [])
           +'<get type="xsd:string" >orbital_params</get>'
           //+'</xsd:all>'
           //+'</xsd:complexType>'
+          //+'</tns:ephemccRequest>'
+          +'</part>'
           +'</ephemccRequest>'
-          //+'</input>'
-          //+'</ephemcc>'
           +'</SOAP-ENV:Body>'
           +'</SOAP-ENV:Envelope>';
         
@@ -107,7 +107,7 @@ angular.module('soapRequest_m', [])
            try {
              $log.debug('SOAPMSGTEST : ',soapMsgEphemc);
              var soapAction = 'http://vo.imcce.fr/webservices/miriade/ephemcc';//getAvailability ephemcc
-             var xsl = $http(requestConfig(true, 'get', miriadeXsl, null,"text/plain;charset=\"utf-8\""));
+             var xsl = $http(requestConfig(false, 'get', miriadeXsl, null,"text/plain;charset=\"utf-8\""));
              var xml = $http(requestConfig(false, 'post', soapAction, soapMsgEphemc,"text/plain;charset=\"utf-8\"")); 
              return $q.all([xsl, xml]);
            } catch (e) {

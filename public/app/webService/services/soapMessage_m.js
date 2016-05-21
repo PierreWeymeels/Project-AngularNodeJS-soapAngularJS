@@ -56,11 +56,11 @@ angular.module('soapMessage_m', [])
              var userRsp = userRspParts[i].imputs;//{}
              var soapElements = '';
              
-             soapElements += '<xsd:all>';
+             //soapElements += '<xsd:all>';
              for (var j = 0; j < imputs.length; ++j) {
                soapElements += '<' + imputs[j].name + ' xsi:type=\"xsd:' + imputs[j].xsdType + '\" >' + userRsp[imputs[j].name] + '</' + imputs[j].name + '>';
              }
-             soapElements += '</xsd:all>';
+             //soapElements += '</xsd:all>';
              
              soapPart += soapElements;
              soapPart += '</' + msgParts[i].form.name + '>'
